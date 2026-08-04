@@ -228,3 +228,26 @@ Entonces $Ax = b$ tiene solución si y solo si $a_{ii} \neq 0$ para todo $i = 1,
 Luego, $det(A) \neq 0$ si y solo si $a_{ii} \neq 0$ para todo $i = 1, \dots, n$. $\blacksquare$
 
 ---
+
+# Algoritmo: **Sustitución Hacia Adelante**
+
+**Entrada:** Matriz triangular inferior $A \in \mathbb{R}^{n \times n}$ y vector $b \in \mathbb{R}^n$.
+
+**Salida:** Vector $x \in \mathbb{R}^n$ tal que $Ax = b$.
+
+1. Para $i = 1, \dots, n$:
+    i. $x_i = b_i$ 
+    ii. Si $i > 1$, para $j = 1, \dots, i-1$: 
+    $$x_i = x_i - a_{ij}x_j$$
+    iii. $x_i = x_i / a_{ii}$
+2. Retornar $x$
+
+---
+# Algoritmo: **Sustitución Hacia Adelante**
+
+**Conteo Operacional:**
+- Sumas/Restas: $\sum_{i=1}^n (i-1) = \frac{n(n-1)}{2}$
+- Multiplicaciones/Divisiones: $\sum_{i=1}^n (i) = \frac{n(n+1)}{2}$
+- Total: $O(n^2)$
+
+---
