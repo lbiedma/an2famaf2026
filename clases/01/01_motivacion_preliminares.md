@@ -246,8 +246,41 @@ Luego, $det(A) \neq 0$ si y solo si $a_{ii} \neq 0$ para todo $i = 1, \dots, n$.
 # Algoritmo: **Sustitución Hacia Adelante**
 
 **Conteo Operacional:**
-- Sumas/Restas: $\sum_{i=1}^n (i-1) = \frac{n(n-1)}{2}$
-- Multiplicaciones/Divisiones: $\sum_{i=1}^n (i) = \frac{n(n+1)}{2}$
-- Total: $O(n^2)$
+
+Bucle externo ($i$) recorre filas. Bucle interno ($j$) recorre columnas hasta $i-1$:
+
+- **Sumas/Restas:** $i-1$ restas por fila, suma total:
+  $$\sum_{i=1}^n (i-1) = \frac{n(n-1)}{2}$$
+- **Multiplicaciones/Divisiones:** $i-1$ multiplicaciones por fila, $1$ división final:
+  $$\sum_{i=1}^n ((i-1) + 1) = \sum_{i=1}^n i = \frac{n(n+1)}{2}$$
+- **Total:** $\frac{n(n-1)}{2} + \frac{n(n+1)}{2} = n^2 \implies O(n^2)$ operaciones.
 
 ---
+
+# Algoritmo: **Sustitución por Columnas**
+
+**Entrada:** Matriz triangular inferior $A \in \mathbb{R}^{n \times n}$ y vector $b \in \mathbb{R}^n$.
+**Salida:** Vector $x \in \mathbb{R}^n$ tal que $Ax = b$.
+
+1. Inicializar $x_i = b_i$ para todo $i = 1, \dots, n$.
+2. Para $j = 1, \dots, n$:
+    i. $x_j = x_j / a_{jj}$
+    ii. Para $i = j+1, \dots, n$:
+    $$x_i = x_i - a_{ij}x_j$$
+3. Retornar $x$
+
+*(A diferencia del enfoque por filas, en cada paso $j$ "limpiamos" el efecto de la variable $x_j$ sobre las ecuaciones restantes utilizando la columna $j$ de $A$)*
+
+---
+
+![](sol_trsup_compare.png)
+
+---
+
+# ¿Cuál elegir? (Perspectiva Numérica)
+
+Aunque el conteo de operaciones es idéntico ($n^2$ flops), el rendimiento depende del **hardware y el lenguaje**:
+
+1. **Localidad de Datos:** Acceder a la memoria de forma contigua (por columnas en Fortran/MATLAB o por filas en C) reduce los fallos de caché.
+2. **Estabilidad:** Ambos métodos son **hacia atrás estables**, lo que significa que la solución calculada $\hat{x}$ es la solución exacta de un sistema perturbado $(L + \delta L)\hat{x} = b$ con $\|\delta L\|$ muy pequeño.
+3. **Matrices Ralas:** Ambas versiones pueden modificarse para ignorar ceros si la matriz tiene muchos.
