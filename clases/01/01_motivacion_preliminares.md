@@ -273,7 +273,7 @@ Bucle externo ($i$) recorre filas. Bucle interno ($j$) recorre columnas hasta $i
 
 ---
 
-![](sol_trsup_compare.png)
+![](sol_trinf_compare.png)
 
 ---
 
