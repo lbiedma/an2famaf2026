@@ -229,6 +229,42 @@ Luego, $det(A) \neq 0$ si y solo si $a_{ii} \neq 0$ para todo $i = 1, \dots, n$.
 
 ---
 
+# Ejemplo: **Sustitución Hacia Adelante**
+
+Queremos resolver el sistema $Ax = b$:
+$$
+\begin{bmatrix}
+2 & 0 & 0 \\
+-1 & 3 & 0 \\
+3 & 2 & 5
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\
+x_2 \\
+x_3
+\end{bmatrix}
+=
+\begin{bmatrix}
+4 \\
+1 \\
+3
+\end{bmatrix}
+\implies
+\begin{cases}
+2x_1 = 4 \\
+-x_1 + 3x_2 = 1 \\
+3x_1 + 2x_2 + 5x_3 = 3
+\end{cases}
+$$
+
+**Paso a paso:**
+- **$i = 1$:** $\quad x_1 = \frac{4}{2} = 2$
+- **$i = 2$:** $\quad x_2 = \frac{1 - (-1)x_1}{3} = \frac{1 + 2}{3} = 1$
+- **$i = 3$:** $\quad x_3 = \frac{3 - 3x_1 - 2x_2}{5} = \frac{3 - 6 - 2}{5} = -1$
+
+**Solución:** $x = [2, 1, -1]^T$.
+
+---
 # Algoritmo: **Sustitución Hacia Adelante**
 
 **Entrada:** Matriz triangular inferior $A \in \mathbb{R}^{n \times n}$ y vector $b \in \mathbb{R}^n$.
@@ -243,6 +279,7 @@ Luego, $det(A) \neq 0$ si y solo si $a_{ii} \neq 0$ para todo $i = 1, \dots, n$.
 2. Retornar $x$
 
 ---
+
 # Algoritmo: **Sustitución Hacia Adelante**
 
 **Conteo Operacional:**
@@ -257,7 +294,7 @@ Bucle externo ($i$) recorre filas. Bucle interno ($j$) recorre columnas hasta $i
 
 ---
 
-# Algoritmo: **Sustitución por Columnas**
+# Algoritmo: **Sustitución Hacia Adelante por Columnas**
 
 **Entrada:** Matriz triangular inferior $A \in \mathbb{R}^{n \times n}$ y vector $b \in \mathbb{R}^n$.
 **Salida:** Vector $x \in \mathbb{R}^n$ tal que $Ax = b$.
@@ -274,6 +311,75 @@ Bucle externo ($i$) recorre filas. Bucle interno ($j$) recorre columnas hasta $i
 ---
 
 ![](sol_trinf_compare.png)
+
+---
+
+# Ejemplo: **Sustitución Hacia Atrás**
+
+Queremos resolver el sistema $Ax = b$:
+$$
+\begin{bmatrix}
+2 & -1 & 3 \\
+0 & 3 & 2 \\
+0 & 0 & 5
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\
+x_2 \\
+x_3
+\end{bmatrix}
+=
+\begin{bmatrix}
+2 \\
+1 \\
+-5
+\end{bmatrix}
+\implies
+\begin{cases}
+2x_1 - x_2 + 3x_3 = 2 \\
+3x_2 + 2x_3 = 1 \\
+5x_3 = -5
+\end{cases}
+$$
+
+**Paso a paso:**
+- **$i = 3$:** $\quad x_3 = \frac{-5}{5} = -1$
+- **$i = 2$:** $\quad x_2 = \frac{1 - 2x_3}{3} = \frac{1 - 2(-1)}{3} = 1$
+- **$i = 1$:** $\quad x_1 = \frac{2 - (-1)x_2 - 3x_3}{2} = \frac{2 + 1 + 3}{2} = 3$
+
+**Solución:** $x = [3, 1, -1]^T$.
+
+---
+# Algoritmo: **Sustitución Hacia Atrás**
+
+**Entrada:** Matriz triangular superior $A \in \mathbb{R}^{n \times n}$ y vector $b \in \mathbb{R}^n$.
+
+**Salida:** Vector $x \in \mathbb{R}^n$ tal que $Ax = b$.
+
+1. Para $i = n, n-1, \dots, 1$:
+    i. $x_i = b_i$ 
+    ii. Si $i < n$, para $j = i+1, \dots, n$: 
+    $$x_i = x_i - a_{ij}x_j$$
+    iii. $x_i = x_i / a_{ii}$
+2. Retornar $x$
+
+**PREGUNTA:** Cuántas operaciones realizamos?
+
+---
+
+# Algoritmo: **Sustitución Hacia Atrás por Columnas**
+
+**Entrada:** Matriz triangular superior $A \in \mathbb{R}^{n \times n}$ y vector $b \in \mathbb{R}^n$.
+**Salida:** Vector $x \in \mathbb{R}^n$ tal que $Ax = b$.
+
+1. Inicializar $x_i = b_i$ para todo $i = 1, \dots, n$.
+2. Para $j = n, n-1, \dots, 1$:
+    i. $x_j = x_j / a_{jj}$
+    ii. Para $i = 1, \dots, j-1$:
+    $$x_i = x_i - a_{ij}x_j$$
+3. Retornar $x$
+
+*(Recorremos de derecha a izquierda utilizando la columna $j$ de $A$ para restar el efecto de la variable $x_j$ ya calculada en las ecuaciones anteriores)*
 
 ---
 
