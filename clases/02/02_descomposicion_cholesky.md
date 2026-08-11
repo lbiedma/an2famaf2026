@@ -77,36 +77,43 @@ Entonces existe una **única** matriz $G \in \mathbb{R}^{n \times n}$ triangular
 **PIZARRÓN**
 Demostración en [Notas ALN Damián Fernandez (Teorema 2.7)](https://drive.google.com/file/d/10h9BvK-P0b4l9-1D7G2T4Q1R9sX6u5M9/view?usp=sharing)
 
+**Corolario:** $A$ es SDP si y sólo si existe $G \in \mathbb{R}^{n \times n}$ triangular superior con elementos diagonales positivos tal que $A = G^T G$.
+
 ---
 
-# **Demostración** (Existencia)
+# Algoritmo de Cholesky (idea)
 
-Usamos inducción en $n$.
+Si estamos en un paso $i < n$, definimos $\mathcal{J} = \{i+1,\dots,n\}$ y veamos el bloque desde $a_{ii}$ en adelante:
 
-**Caso Base:**
+$$\begin{bmatrix} a_{ii} & A_{i\mathcal{J}} \\ A_{\mathcal{J}i} & A_{\mathcal{J}\mathcal{J}} \end{bmatrix} = \begin{bmatrix} g_{ii} & 0 \\ G_{\mathcal{J}i}^T & G_{\mathcal{J}\mathcal{J}}^T \end{bmatrix} \begin{bmatrix} g_{ii} & G_{i\mathcal{J}} \\ 0 & G_{\mathcal{J}\mathcal{J}} \end{bmatrix}$$
 
-Si $n=1$, $A = [a_{11}]$. Como $A$ es SDP, $a_{11} > 0$. Entonces $G = [\sqrt{a_{11}}]$ es la descomposición de Cholesky.
+Luego:
+- $a_{ii} = g_{ii}^2$ y por lo tanto $g_{ii} = \sqrt{a_{ii}}$.
+- $A_{i\mathcal{J}} = g_{ii} G_{i\mathcal{J}}$ y por lo tanto $G_{i\mathcal{J}} = \frac{1}{g_{ii}} A_{i\mathcal{J}}$.
+- Tenemos además $A_{\mathcal{J}\mathcal{J}} = G_{\mathcal{J}i}^T G_{i\mathcal{J}} + G_{\mathcal{J}\mathcal{J}}^T G_{\mathcal{J}\mathcal{J}}$, entonces debemos actualizar
 
-**Hipótesis Inductiva:**
+$$A_{\mathcal{J}\mathcal{J}} \leftarrow A_{\mathcal{J}\mathcal{J}} - G_{\mathcal{J}i}^T G_{i\mathcal{J}}$$
 
-Supongamos que el teorema es válido para matrices de tamaño $n-1$. Es decir, toda matriz $(n-1)\times(n-1)$ simétrica y definida positiva tiene una única descomposición de Cholesky.
+- Repetir hasta terminar!
 
-**Paso Inductivo:**
+---
 
-Consideremos $A \in \mathbb{R}^{n \times n}$ simétrica y definida positiva.
+![](cholesky_prod_ext.png)
 
---- 
+---
 
-# **Demostración** (Unicidad)
+# Algoritmo **(Descomposición de Cholesky)**
 
---- 
+**Entrada:** Matriz "SDP" $A \in \mathbb{R}^{n \times n}$.
+**Salida:** Matriz triangular superior $G \in \mathbb{R}^{n \times n}$ tal que $A = G^T G$.
 
-# Algoritmo de Cálculo (Producto Interior)
+Para $i=1,\dots,n$ definir:
 
-- El **Algoritmo 6** describe cómo obtener $G$ fila por fila utilizando productos internos [6].
-- El proceso define iterativamente cada elemento de la diagonal como $G_{ii} = \sqrt{A_{ii} - \sum_{k=1}^{i-1} G_{ki}^2}$ [7].
-- Para que el algoritmo sea correcto, es imperativo controlar que la entrada diagonal sea **positiva** antes de extraer la raíz cuadrada [7].
-- Si durante la ejecución se encuentra una entrada diagonal no positiva, se deduce que la matriz original **no es definida positiva** y el proceso debe detenerse [7].
+1. $g_{ii} = \sqrt(a_{ii}$
+2. Si $i < n$ entonces
+    - $\mathcal{J} = \{ i+1, \dots, n \}$
+    - $g_{i\mathcal{J}} = A_{i\mathcal{J}} / g_{ii}$
+    - $A_{\mathcal{J}\mathcal{J}} \leftarrow A_{\mathcal{J}\mathcal{J}} - G_{i\mathcal{J}}^T G_{i\mathcal{J}}$
 
 ---
 
