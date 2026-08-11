@@ -40,7 +40,7 @@ paginate: true
 ---
 
 # Primero lo administrativo
-### Días y Horarios: Miércoles y Viernes de 9 a 13hs en Laboratorio 28
+### Días y Horarios: Miércoles y Viernes de 9 a 13hs en Laboratorio 17
 ## Evaluación
 - 2 Parciales, 1 Recuperatorio, 1 Proyecto
 - Para Promocionar
