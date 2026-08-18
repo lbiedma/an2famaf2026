@@ -143,20 +143,11 @@ Aunque parezca más compleja, la perspectiva del producto exterior es crucial pa
 ---
 # Se acuerdan de Eliminación Gaussiana?
 
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-<div>
-
 Sea $A = \begin{bmatrix} 1 & 4 & 7 \\ 2 & 5 & 8 \\ 3 & 6 & 10 \end{bmatrix}$.
-
-</div>
-<div>
 
 Multiplicamos f1 por -2 y se la restamos a f2, multiplicamos f1 por -3 y se la restamos a f3. Luego, multiplicamos f2 por -2 y se la restamos a f3:
 
 $$ \begin{bmatrix} 1 & 4 & 7 \\ 2 & 5 & 8 \\ 3 & 6 & 10 \end{bmatrix} \quad \longrightarrow \quad \begin{bmatrix} 1 & 4 & 7 \\ 0 & -3 & -6 \\ 0 & -6 & -11 \end{bmatrix} \quad \longrightarrow \quad \begin{bmatrix} 1 & 4 & 7 \\ 0 & -3 & -6 \\ 0 & 0 & 1 \end{bmatrix}.$$
-
-</div>
-</div>
 
 ---
 
@@ -166,4 +157,130 @@ Si deseo transformar la columna $k$ de $A$, en un vector con $x_i = 0$ para $i =
 
 $$ M_k = I - v^k (e^k)^T $$
 
-donde $v^k = \begin{bmatrix} 0 & \dots & 0 & a_{k+1,k}/a_{kk} & \dots & a_{n,k}/a_{kk} \end{bmatrix}^T$ y $e^k$ es el k-ésimo vector canónico.
+donde $v^k = \begin{bmatrix} 0, & \dots, & 0, & a_{k+1,k}/a_{kk}, & \dots, & a_{n,k}/a_{kk} \end{bmatrix}^T$ y $e^k$ es el k-ésimo vector canónico.
+
+_Qué pinta tiene esta matriz? Podemos usarla para expresar la eliminación gaussiana?_
+
+La idea es realizar la premultiplicación de $A$ por $M_k$ para transformar la columna $k$ de $A$ en un vector con $a_{i,k} = 0$ para $i = k+1, \dots, n$.
+
+---
+
+# Volviendo al Ejemplo
+
+Sea $A = \begin{bmatrix} 1 & 4 & 7 \\ 2 & 5 & 8 \\ 3 & 6 & 10 \end{bmatrix}$.
+
+"Multiplicamos f1 por -2 y se la restamos a f2, multiplicamos f1 por -3 y se la restamos a f3". Luego, multiplicamos f2 por -2 y se la restamos a f3.
+
+Es decir, premultiplicamos por $M_1 = I - \begin{bmatrix} 0 \\ 2 \\ 3 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 \\ -2 & 1 & 0 \\ -3 & 0 & 1 \end{bmatrix}$ y luego por $M_2 = I - \begin{bmatrix} 0 \\ 0 \\ 2 \end{bmatrix} \begin{bmatrix} 0 & 1 & 0 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & -2 & 1 \end{bmatrix}$
+
+---
+
+# Eliminación Gaussiana
+
+Para resolver $Ax = b$, aplicamos transformaciones de Gauss hasta obtener $Ux = y$ equivalente, donde
+
+$$ y = M_{n-1} \dots M_1 b,  \quad U = M_{n-1} \dots M_1 A $$
+
+luego $U$ es un sistema triangular superior, entonces podemos resolver $Ux = y$ por **sustitución hacia adelante**.
+
+Veamos el algoritmo de eliminación gaussiana de manera matricial, sin utilizar memoria extra.
+
+---
+
+# Algoritmo **(Eliminación Gaussiana)**
+**Entrada:** Sistema Lineal $A \in \mathbb{R}^{n \times n}$ y vector $b \in \mathbb{R}^n$.
+**Salida:** Matriz triangular superior $U$ y vector $y$ tales que $Ux = y$.
+
+1. Para $k = 1 \dots n-1$, definir
+    - $\mathcal{I} = \{ k+1, \dots, n \}$
+    - $\mathcal{J} = \{ k, \dots, n \}$
+    - $v_{\mathcal{I}} = A_{\mathcal{I},k} / a_{k,k}$
+    - $A_{\mathcal{I},\mathcal{J}} \leftarrow A_{\mathcal{I},\mathcal{J}} - v_{\mathcal{I}} A_{k,\mathcal{J}}$
+    - $b_{\mathcal{I}} \leftarrow b_{\mathcal{I}} - v_{\mathcal{I}} b_{k}$
+2. Retornar $U = A$, $y = b$.
+
+_Cuántas operaciones estamos haciendo?_
+
+---
+
+# Conteo Operacional
+
+1. Para cada paso $k$ tendremos $n-k$ productos para conseguir $v_{\mathcal{I}}$
+2. $(n-k) (n-k+1)$ productos y $(n-k) (n-k+1)$ sumas para actualizar $A_{\mathcal{I},\mathcal{J}}$
+3. $(n-k)$ productos y $(n-k)$ sumas para actualizar $b_{\mathcal{I}}$
+
+Sumando todo tendremos aproximadamente $\frac{2}{3}n^3$ flops.
+
+_Cuánto tenemos si le sumamos la resolución del sistema lineal?_
+
+---
+
+# Descomposición LU
+
+Tenemos un conjunto de Transformaciones de Gauss que aplicamos a izquierda para obtener una matriz triangular superior $U$.
+
+$$ U = M_{n-1} \dots M_1 A $$
+
+Entonces
+
+$$ A = (M_{n-1} \dots M_1)^{-1} U = M_1^{-1} \dots M_{n-1}^{-1} U $$
+
+Definimos $L = M_1^{-1} \dots M_{n-1}^{-1}$
+
+_Existen las inversas de las matrices $M_k$?_
+
+**PIZARRON**
+
+---
+
+# Teorema **(Existencia y Unicidad de la Descomposición LU)**
+
+Sea $A \in \mathbb{R}^{n \times n}$. Si $det(A_k) \neq 0$ para toda submatriz principal de tamaño $k \in \{1, \dots, n\}$, entonces existe una factorización única de $A$ de la forma
+
+$$ A = L U $$
+
+donde $L \in \mathbb{R}^{n \times n}$ es una matriz triangular inferior con $L_{ii} = 1$ para todo $i \in \{1, \dots, n\}$, y $U \in \mathbb{R}^{n \times n}$ es una matriz triangular superior.
+
+---
+
+# Demostración (Existencia)
+- Definimos $A^{(0)} = A$ y $A^{(k)} = M_{k} A^{(k-1)}$ para $k=1 \dots n-1$.
+- Existencia: hemos construido las $M_i$, falta demostrar que están bien definidas, esto es: ($a^{(k-1)}_{k,k}$) es distinto de cero.
+    - Caso base: $k=1$, si $det(A_{11}) \neq 0$ entonces $a^{(0)}_{11} \neq 0$.
+    - Supongamos que existen transformaciones de Gauss tales que $A^{(k-1)} = \Gamma A$, con $\Gamma = M_{k-2} \dots M_1$.
+    - Definimos $\mathcal{I} = \{1, \dots, k\}$ y $\mathcal{J} = \{k+1, \dots, n\}$.
+
+$$
+    A^{(k)} =  \Gamma A = \begin{bmatrix} \Gamma_{\mathcal{I},\mathcal{I}} & 0 \\ \Gamma_{\mathcal{J},\mathcal{I}} & \Gamma_{\mathcal{J},\mathcal{J}} \end{bmatrix} \begin{bmatrix} A_{\mathcal{I},\mathcal{I}} & A_{\mathcal{I},\mathcal{J}} \\ A_{\mathcal{J},\mathcal{I}} & A_{\mathcal{J},\mathcal{J}} \end{bmatrix}
+$$
+
+---
+
+# Demostración (Existencia)
+- Luego, $det(A^{(k-1)}_{\mathcal{I},\mathcal{I}}) = det(\Gamma_{\mathcal{I},\mathcal{I}}A_{\mathcal{I},\mathcal{I}}) = det( \begin{bmatrix} a_{11}^{(k-1)} & \dots & a_{1k}^{(k-1)} \\\\ 0 & \ddots & \vdots \\\\ 0 & 0 & a_{kk}^{(k-1)} \end{bmatrix} ) = \prod_{j=1}^k a_{jj}^{(k-1)}$
+
+- Como, por hipótesis, $det(A_j) \neq 0$ para todo $j \in \{1, \dots, k\}$, entonces
+$$ a_{kk}^{(k-1)} \neq 0, \quad \forall k \in \{1, \dots, n \} $$
+
+- Finalmente, todas las transformaciones de Gauss están bien definidas y puedo definir las matrices $L = (M_1 \dots M_{n-1})^{-1}$ y $U = A^{(n)}$.
+
+---
+
+# Demostración (Unicidad)
+- Supongamos que existen dos descomposiciones 
+$$ A = L_1 U_1 = L_2 U_2 $$
+
+---
+
+# Algoritmo **(Factorización LU)**
+**Entrada:** Matriz $A \in \mathbb{R}^{n \times n}$ con $det(A_k) \neq 0$ para toda submatriz principal de tamaño $k \in \{1, \dots, n\}$.
+**Salida:** Matrices $L \in \mathbb{R}^{n \times n}$ y $U \in \mathbb{R}^{n \times n}$ tales que $A = L U$.
+
+1. Inicializar $L = I$ y $U = A$.
+2. Para $k = 1 \dots n-1$, definir
+    - $\mathcal{I} = \{ k+1, \dots, n \}$
+    - $\mathcal{J} = \{ k, \dots, n \}$
+    - $v_{\mathcal{I}} = U_{\mathcal{I},k} / u_{k,k}$
+    - $L_{\mathcal{I},k} = v_{\mathcal{I}}$
+    - $U_{\mathcal{I},\mathcal{J}} \leftarrow U_{\mathcal{I},\mathcal{J}} - v_{\mathcal{I}} U_{k,\mathcal{J}}$
+3. Retornar $L$, $U$.
