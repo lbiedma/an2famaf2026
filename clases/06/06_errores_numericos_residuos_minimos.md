@@ -44,9 +44,6 @@ $$\kappa(A) = \|A\| \|A^{-1}\| $$
 Como $\|A^{-1}\| = 1 / \min_{\|x\|=1} \|Ax\|$, el número de condición mide la relación entre la distorsión máxima y mínima de la esfera unidad bajo $A$:
 $$\kappa(A) = \frac{\max_{\|x\|=1} \|Ax\|}{\min_{\|x\|=1} \|Ax\|} $$
 
-- **En Norma-2:** Se calcula usando los autovalores extremos de $A^T A$:
-  $$\kappa_2(A) = \frac{\sigma_{\max}}{\sigma_{\min}} = \sqrt{\frac{\lambda_{\max}(A^T A)}{\lambda_{\min}(A^T A)}} $$
-
 ---
 
 # Ejemplo Numérico de Mal Condicionamiento
@@ -89,6 +86,10 @@ $$(I - F)^{-1} = \sum_{k=0}^\infty F^k, \quad \text{con} \quad \|(I - F)^{-1}\| 
 
 Esto nos permite analizar matrices arbitrarias no singulares bajo una perturbación $\Theta$:
 
+---
+
+# Continuamos
+
 **Teorema:** Si $A$ es no singular y $\|A^{-1}\Theta\| < 1$, entonces $A + \Theta$ es no singular, cumpliéndose:
 $$\|(A + \Theta)^{-1}\| \le \frac{\|A^{-1}\|}{1 - \|A^{-1}\Theta\|} $$
 
@@ -126,13 +127,44 @@ Dado que $\|b\| = \|A\bar{x}\| \le \|A\|\|\bar{x}\|$, se cumple $\frac{1}{\|A\|\
 
 ---
 
+# Recuento: Descomposición de Cholesky
+
+Para sistemas lineales cuya matriz es **simétrica y definida positiva (SPD)**, disponemos de una herramienta eficiente:
+
+- **El Teorema de Cholesky:** Garantiza que toda matriz SPD puede factorizarse de manera única como $A = G^T G$, donde $G$ es triangular superior con elementos diagonales positivos.
+- **Eficiencia por Simetría:** Al explotar la estructura simétrica, el costo de Cholesky es de aproximadamente **$\frac{1}{3}n^3$ flops**.
+- **Estabilidad Intrínseca:** El algoritmo es extremadamente estable ante errores de redondeo en punto flotante (*backward stable*), prescindiendo de estrategias de pivoteo.
+
+---
+
+# Recuento: Descomposición LU
+
+Hasta ahora hemos estudiado la resolución de **sistemas de ecuaciones cuadrados** ($Ax = b$ con $A \in \mathbb{R}^{n \times n}$):
+
+- **Eliminación Gaussiana:** Permite reducir la matriz a una forma triangular superior $U$ aplicando transformaciones de Gauss $M_k$.
+- **Existencia y Unicidad:** La factorización $A = LU$ (con $L$ triangular inferior unitaria) existe y es única si y solo si todos los menores principales de $A$ son no singulares.
+- **Pivoteo Parcial:** Ante pivotes nulos o muy pequeños, el intercambio de filas (permutación $PA = LU$) evita fallas y controla el error.
+- **Costo Computacional:** El proceso de factorización requiere aproximadamente **$\frac{2}{3}n^3$ flops**.
+
+---
+
+# Recuento: Sensibilidad y Estabilidad Numérica
+
+En la práctica computacional con aritmética de precisión finita (doble precisión, 64 bits), las soluciones exactas se ven afectadas por perturbaciones inevitables:
+
+- **Propagación del Error:** Al resolver el sistema perturbado $(A+\Theta)\hat{x} = b+\vartheta$, el error relativo de la solución queda acotado por:
+  $$\frac{\|\hat{x} - \bar{x}\|}{\|\bar{x}\|} \le \frac{\kappa(A)}{1 - \kappa(A)\frac{\|\Theta\|}{\|A\|}} \left( \frac{\|\Theta\|}{\|A\|} + \frac{\|\vartheta\|}{\|b\|} \right)$$
+- **Número de Condición:** Definido como $\kappa(A) = \|A\|\|A^{-1}\|$, mide la sensibilidad del sistema. Un valor elevado de $\kappa(A)$ significa que pequeñas perturbaciones de redondeo destruirán la precisión de la solución calculada.
+
+---
+
 # El Problema de Residuos Mínimos
 
-Con frecuencia, un sistema lineal $Ax = b$ con $A \in \mathbb{R}^{m \times n}$ y $b \in \mathbb{R}^m$ (particularmente cuando $m > n$, un sistema sobredeterminado) **no posee solución exacta** [141].
+Con frecuencia, un sistema lineal $Ax = b$ con $A \in \mathbb{R}^{m \times n}$ y $b \in \mathbb{R}^m$ (particularmente cuando $m > n$, un sistema sobredeterminado) **no posee solución exacta**.
 
-- En tales escenarios, la mejor opción consiste en hacer que el **vector residuo** $r(x) = b - Ax$ sea lo más pequeño posible en alguna norma [141, 132]:
+- En tales escenarios, la mejor opción consiste en hacer que el **vector residuo** $r(x) = b - Ax$ sea lo más pequeño posible en alguna norma:
   $$\min_{x \in \mathbb{R}^n} \|Ax - b\|$$
-- Si elegimos medir este residuo bajo la norma Euclídea ($p=2$), el problema se conoce como **Cuadrados Mínimos** [144]:
+- Si elegimos medir este residuo bajo la norma Euclídea ($p=2$), el problema se conoce como **Cuadrados Mínimos**:
   $$\min_{x \in \mathbb{R}^n} \|Ax - b\|_2^2$$
 
 ---
@@ -141,54 +173,56 @@ Con frecuencia, un sistema lineal $Ax = b$ con $A \in \mathbb{R}^{m \times n}$ y
 
 Definiendo la función objetivo diferenciable $f(x) = \frac{1}{2}\|Ax - b\|_2^2$ [182], buscamos su punto crítico igualando su gradiente a cero [21, 182]:
 
-$$\nabla f(x) = A^T(Ax - b) = 0 \quad [182]$$
+$$\nabla f(x) = A^T(Ax - b) = 0$$
 
-Esto nos conduce de forma directa al célebre sistema lineal [182]:
+Esto nos conduce de forma directa al célebre sistema lineal:
 $$A^T A x = A^T b$$
 
-- Este sistema es conocido como la **ecuación normal** [182].
-- Si la matriz $A$ tiene rango completo $n$, la matriz $A^T A \in \mathbb{R}^{n \times n}$ es simétrica y definida positiva [183], lo que teóricamente permite resolver el sistema mediante la descomposición de Cholesky [183].
+- Este sistema es conocido como la **ecuación normal**.
+- Si la matriz $A$ tiene rango completo $n$, la matriz $A^T A \in \mathbb{R}^{n \times n}$ es simétrica y definida positiva, lo que teóricamente permite resolver el sistema mediante la descomposición de Cholesky.
 
 ---
 
-# El Peligro Numérico de las Ecuaciones Normales
+# Qué problemas podemos tener?
 
-Aunque las ecuaciones normales son una herramienta fundamental desde el análisis teórico, **no se recomienda su uso como herramienta computacional directa** [183].
+Aunque las ecuaciones normales son una herramienta fundamental desde el análisis teórico, **no se recomienda su uso como herramienta computacional directa**.
 
-- **Efecto en el Número de Condición:** El número de condición de la matriz del sistema se eleva al cuadrado [183]:
-  $$\kappa_2(A^T A) = (\kappa_2(A))^2$$
-- **Consecuencia de Precisión Finitas:** Si una matriz $A$ está moderadamente mal condicionada (ej. $\kappa_2(A) = 10^4$), el sistema de ecuaciones normales tendrá $\kappa_2(A^T A) = 10^8$, amplificando drásticamente el error de redondeo en aritmética de doble precisión [183].
+- **Efecto en el Número de Condición:** El número de condición de la matriz del sistema se eleva al cuadrado: $\kappa_2(A^T A) = (\kappa_2(A))^2$
+- **Consecuencia de Precisión Finita:** Si una matriz $A$ está moderadamente mal condicionada (ej. $\kappa_2(A) = 10^4$), el sistema de ecuaciones normales amplificará drásticamente el error de redondeo en aritmética de doble precisión.
 - Adicionalmente, el cálculo explícito del producto $A^T A$ puede provocar una pérdida catastrófica de información e independencia lineal en punto flotante.
 
 ---
 
-# Una Propuesta Superadora: Descomposición QR
+# Descomposición QR
 
-Para evitar construir la matriz $A^T A$, buscamos una transformación que reduzca el sistema preservando la norma Euclídea. Esto nos lleva a las **matrices ortogonales** $Q \in \mathbb{R}^{m \times m}$ ($Q^T Q = I$) [145].
+Para evitar construir la matriz $A^T A$, buscamos una transformación que reduzca el sistema preservando la norma Euclídea. Esto nos lleva a las **matrices ortogonales** $Q \in \mathbb{R}^{m \times m}$ ($Q^T Q = I$).
 
 - Las matrices ortogonales **preservan la norma 2** [145]:
   $$\|Q v\|_2 = \|v\|_2 \quad \forall v \in \mathbb{R}^m \quad [145]$$
-- El Teorema 4.3 garantiza que para cualquier matriz $A \in \mathbb{R}^{m \times n}$ existe una matriz ortogonal $Q$ y una triangular superior $R \in \mathbb{R}^{m \times n}$ tales que [151]:
+- El Teorema 4.3 garantiza que para cualquier matriz $A \in \mathbb{R}^{m \times n}$ existe una matriz ortogonal $Q$ y una triangular superior $R \in \mathbb{R}^{m \times n}$ tales que:
   $$A = QR$$
-- En su **factorización QR reducida** (para rango completo $n$) [166]:
-  $$A = Q_1 R_1$$
-  donde $Q_1 \in \mathbb{R}^{m \times n}$ tiene columnas ortonormales y $R_1 \in \mathbb{R}^{n \times n}$ es triangular superior [166].
 
 ---
 
-# Solución de Cuadrados Mínimos mediante QR
+# Solución de Cuadrados Mínimos con QR
 
-Utilizando la propiedad de preservación de norma de la matriz ortogonal $Q^T$ [145, 168]:
+- En su **factorización QR reducida** (para rango completo $n$):
+  $$A = Q_1 R_1$$
+donde $Q_1 \in \mathbb{R}^{m \times n}$ tiene columnas ortonormales y $R_1 \in \mathbb{R}^{n \times n}$ es triangular superior.
 
-$$\|Ax - b\|_2^2 = \|Q^T(Ax - b)\|_2^2 = \|Q^T Ax - Q^T b\|_2^2 \quad [168]$$
+Utilizando la propiedad de preservación de norma de la matriz ortogonal $Q^T$:
 
-Particionando los bloques según las dimensiones del rango [168]:
-$$Q^T A = \begin{bmatrix} R_1 \\ 0 \end{bmatrix}, \quad Q^T b = \begin{bmatrix} c \\ d \end{bmatrix} \quad \text{con } R_1 \in \mathbb{R}^{n \times n}, \ c \in \mathbb{R}^n, \ d \in \mathbb{R}^{m-n} \quad [168]$$
+$$\|Ax - b\|_2^2 = \|Q^T(Ax - b)\|_2^2 = \|Q^T Ax - Q^T b\|_2^2$$
 
-La norma se reduce algebraicamente a [168]:
-$$\|Ax - b\|_2^2 = \left\| \begin{bmatrix} R_1 x - c \\ -d \end{bmatrix} \right\|_2^2 = \|R_1 x - c\|_2^2 + \|d\|_2^2 \quad [168]$$
+Particionando los bloques según las dimensiones del rango:
+$$Q^T A = \begin{bmatrix} R_1 \\ 0 \end{bmatrix}, \quad Q^T b = \begin{bmatrix} c \\ d \end{bmatrix} \quad \text{con } R_1 \in \mathbb{R}^{n \times n}, \ c \in \mathbb{R}^n, \ d \in \mathbb{R}^{m-n}$$
 
-- El residuo mínimo se alcanza resolviendo el sistema triangular [168]:
+---
+
+La norma se reduce algebraicamente a:
+$$\|Ax - b\|_2^2 = \left\| \begin{bmatrix} R_1 x - c \\ -d \end{bmatrix} \right\|_2^2 = \|R_1 x - c\|_2^2 + \|d\|_2^2$$
+
+- El residuo mínimo se alcanza resolviendo el sistema triangular:
   $$R_1 \hat{x} = c$$
-- El error mínimo absoluto es precisamente $\|d\|_2$ [168].
-- **Ventaja Numérica:** El condicionamiento de la matriz resultante es estable: $\kappa_2(R_1) = \kappa_2(A)$ [183].
+- El error mínimo absoluto es precisamente $\|d\|_2$.
+- **Ventaja Numérica:** El condicionamiento de la matriz resultante es estable: $\kappa_2(R_1) = \kappa_2(A)$.
