@@ -129,9 +129,9 @@ Dado que $\|b\| = \|A\bar{x}\| \le \|A\|\|\bar{x}\|$, se cumple $\frac{1}{\|A\|\
 
 # Recuento: Descomposición de Cholesky
 
-Para sistemas lineales cuya matriz es **simétrica y definida positiva (SPD)**, disponemos de una herramienta eficiente:
+Para sistemas lineales cuya matriz es **simétrica y definida positiva (SDP)**, disponemos de una herramienta eficiente:
 
-- **El Teorema de Cholesky:** Garantiza que toda matriz SPD puede factorizarse de manera única como $A = G^T G$, donde $G$ es triangular superior con elementos diagonales positivos.
+- **El Teorema de Cholesky:** Garantiza que toda matriz SDP puede factorizarse de manera única como $A = G^T G$, donde $G$ es triangular superior con elementos diagonales positivos.
 - **Eficiencia por Simetría:** Al explotar la estructura simétrica, el costo de Cholesky es de aproximadamente **$\frac{1}{3}n^3$ flops**.
 - **Estabilidad Intrínseca:** El algoritmo es extremadamente estable ante errores de redondeo en punto flotante (*backward stable*), prescindiendo de estrategias de pivoteo.
 
@@ -171,7 +171,7 @@ Con frecuencia, un sistema lineal $Ax = b$ con $A \in \mathbb{R}^{m \times n}$ y
 
 # Resolución Analítica: Ecuaciones Normales
 
-Definiendo la función objetivo diferenciable $f(x) = \frac{1}{2}\|Ax - b\|_2^2$ [182], buscamos su punto crítico igualando su gradiente a cero [21, 182]:
+Definiendo la función objetivo diferenciable $f(x) = \frac{1}{2}\|Ax - b\|_2^2$ [182], buscamos su punto crítico igualando su gradiente a cero:
 
 $$\nabla f(x) = A^T(Ax - b) = 0$$
 
@@ -197,32 +197,12 @@ Aunque las ecuaciones normales son una herramienta fundamental desde el análisi
 
 Para evitar construir la matriz $A^T A$, buscamos una transformación que reduzca el sistema preservando la norma Euclídea. Esto nos lleva a las **matrices ortogonales** $Q \in \mathbb{R}^{m \times m}$ ($Q^T Q = I$).
 
-- Las matrices ortogonales **preservan la norma 2** [145]:
-  $$\|Q v\|_2 = \|v\|_2 \quad \forall v \in \mathbb{R}^m \quad [145]$$
-- El Teorema 4.3 garantiza que para cualquier matriz $A \in \mathbb{R}^{m \times n}$ existe una matriz ortogonal $Q$ y una triangular superior $R \in \mathbb{R}^{m \times n}$ tales que:
-  $$A = QR$$
+- Las matrices ortogonales **preservan la norma 2**:
+  $$\|Q v\|_2 = \|v\|_2 \quad \forall v \in \mathbb{R}^m$$
+- Vamos a construir una sucesión de matrices ortogonales $Q_k$ tales que 
 
----
+$$A_k = Q_k^T A_{k-1} = \begin{bmatrix} R_k \\ 0 \end{bmatrix}$$
 
-# Solución de Cuadrados Mínimos con QR
+De modo que
 
-- En su **factorización QR reducida** (para rango completo $n$):
-  $$A = Q_1 R_1$$
-donde $Q_1 \in \mathbb{R}^{m \times n}$ tiene columnas ortonormales y $R_1 \in \mathbb{R}^{n \times n}$ es triangular superior.
-
-Utilizando la propiedad de preservación de norma de la matriz ortogonal $Q^T$:
-
-$$\|Ax - b\|_2^2 = \|Q^T(Ax - b)\|_2^2 = \|Q^T Ax - Q^T b\|_2^2$$
-
-Particionando los bloques según las dimensiones del rango:
-$$Q^T A = \begin{bmatrix} R_1 \\ 0 \end{bmatrix}, \quad Q^T b = \begin{bmatrix} c \\ d \end{bmatrix} \quad \text{con } R_1 \in \mathbb{R}^{n \times n}, \ c \in \mathbb{R}^n, \ d \in \mathbb{R}^{m-n}$$
-
----
-
-La norma se reduce algebraicamente a:
-$$\|Ax - b\|_2^2 = \left\| \begin{bmatrix} R_1 x - c \\ -d \end{bmatrix} \right\|_2^2 = \|R_1 x - c\|_2^2 + \|d\|_2^2$$
-
-- El residuo mínimo se alcanza resolviendo el sistema triangular:
-  $$R_1 \hat{x} = c$$
-- El error mínimo absoluto es precisamente $\|d\|_2$.
-- **Ventaja Numérica:** El condicionamiento de la matriz resultante es estable: $\kappa_2(R_1) = \kappa_2(A)$.
+$$A = Q_1 Q_2 \dots Q_m \begin{bmatrix} R \\ 0 \end{bmatrix} = QR$$
