@@ -183,30 +183,174 @@ $$ A_{m, \mathcal{J}} \leftarrow -A_{m, \mathcal{J}}, \quad Q_{*, m} \leftarrow 
 
 Para realizar una factorización QR en una matriz $m \times n$, debemos anular todos los elementos por debajo de la diagonal principal:
 
+- Detalles en **pizarra**
 - Aplicar una rotación de Givens a una matriz $m \times n$ (es decir, actualizar dos filas de longitud $n$) cuesta aproximadamente $6n$ *flops*.
 - Para triangularizar la matriz, necesitamos eliminar aproximadamente $\frac{1}{2} n(2m-n-1)$ elementos (para $m \ge n$).
 - Costo total (generar $R$): $\approx 3mn^2 - n^3$ *flops*. Para una matriz $n \times n$: $\approx 2n^3$ *flops*.
 
 ---
 
-# Aplicación en Mínimos Cuadrados
+# Teorema (Descomposición QR)
 
-Una vez que la matriz $A$ se ha reducido a una forma triangular superior $R$ mediante rotaciones de Givens, el sistema de mínimos cuadrados $Ax \approx b$ se transforma de manera equivalente en:
+Sea $A \in \mathbb{R}^{m \times n}$. Entonces existe una matriz ortogonal $Q \in \mathbb{R}^{m \times m}$ y una matriz triangular superior $R \in \mathbb{R}^{n \times n}$ con $r_{ii} > 0$ para todo $i = 1 \dots n$, tales que $A = QR$.
 
-$$Q^T A x \approx Q^T b \quad \implies \quad R x \approx b'$$
-
-Donde $b' = Q^T b$. El nuevo sistema matricial $Rx \approx b'$ mantiene la misma estructura de dimensiones $m \times n$ pero con la particularidad de que $R$ posee ceros por debajo de la diagonal principal.
+**Demostración: ya lo hicimos! :D**
 
 ---
 
-La estructura de matriz triangular superior de $R$ permite aislar las ecuaciones correspondientes a las filas no nulas. Específicamente, si $r$ denota el rango efectivo de $A$ (el número de filas no nulas en $R$, con $r \leq \min\{m, n\}$), las últimas $m-r$ ecuaciones del sistema son triviales (equivalentes a $0 \approx 0$).
+# Hacia algo más eficiente
 
-Por lo tanto, el problema se reduce a resolver el sistema cuadrado $R_{r \times r} x = b'_{r}$, donde $R_{r \times r}$ es la submatriz triangular superior de orden $r$ obtenida extrayendo las primeras $r$ filas de $R$, y $b'_r$ es el vector de tamaño $r$ correspondiente a las primeras $r$ componentes de $b'$.
+- Todo bien con tener una herramienta que nos permita obtener la descomposición $QR$ de una matriz $A \in \mathbb{R}^{m \times n}$, pero podríamos desear una que sea más eficiente.
+- Por ejemplo, las transformaciones de Gauss afectan directamente a toda la columna de $A$ durante la descomposición LU, pero las rotaciones de Givens sólo afectan a dos filas a la vez.
+- Vamos a aplicar esta misma idea para la próxima técnica.
+
+---
+# Transformaciones de Householder
+
+- Una transformación de Householder (o reflexión de Householder) es una matriz que representa una reflexión respecto a un hiperplano. 📐
+
+- Geométricamente, es una transformación lineal que refleja (o invierte) un espacio vectorial respecto a un plano o hiperplano.
+
+![height:250 center](https://upload.wikimedia.org/wikipedia/commons/f/f9/Householdertransformation.png)
 
 ---
 
-Finalmente, la solución del sistema triangular $R_{r \times r} x = b'_r$ se obtiene mediante sustitución regresiva. Para cada fila $i$ desde $r$ hasta $1$, se despeja la componente diagonal $x_i$ utilizando los valores ya calculados para $x_{i+1}, \dots, x_r$:
+# Propiedades de una Reflexión
 
-$$x_i = \frac{1}{R_{i,i}} \left( b'_i - \sum_{j=i+1}^r R_{i,j} x_j \right)$$
+Sea $P \in \mathbb{R}^{m \times m}$ una _reflexión_, entonces cumple:
 
-Este proceso genera la solución de mínimos cuadrados $x$ para el sistema original $Ax \approx b$.
+- Es **ortogonal**: una reflexión preserva la longitud de los vectores y los ángulos entre ellos, sólo que de forma espejada.
+- Es **simétrica** ($P^T = P$) e **involutiva** ($P^2 = I$).
+- Puede transformar cualquier vector dado $x$ en otro vector $y$, siempre y cuando tengan la misma norma euclídea ($\|x\|_2 = \|y\|_2$).
+
+Existe este bicho o es una gallina esférica en el vacío?
+
+---
+
+# Proposición
+Sea $u \in \mathbb{R}^m \setminus \{0\}$. Definimos
+$$Q_u = I - \frac{2}{\|u\|_2^2} u u^T \in \mathbb{R}^{m \times m}$$
+como _reflexión de Householder_ respecto al hiperplano ortogonal al vector $u$. Entonces:
+
+1. $Qu = -u$,
+2. $Qv = v$ si $u \perp v$.
+3. $Q = Q^T$,
+4. $Q = Q^{-1}$.
+
+**Demostración en pizarra**
+
+---
+
+# Aplicación en QR
+
+Para la primera columna $x = a_1$, buscamos una reflexión $Q_1$ tal que $Q_1 x$ sea un múltiplo de $e^1$:
+
+$$Q_1 x = \begin{pmatrix} \sigma \\ 0 \\ \vdots \\ 0 \end{pmatrix} = \sigma e_1 \quad \text{con } |\sigma| = \|x\|_2$$
+
+El vector normal al hiperplano de reflexión debe ser paralelo a la resta de $x$ y su imagen reflejada $\sigma e_1$:
+$$v = x - \sigma e_1$$
+
+---
+
+# Aplicación en QR
+La matriz de Householder que realiza la reflexión sobre el hiperplano ortogonal a $v$ es:
+$$P_1 = I - \frac{2}{\|v\|_2^2} v v^T = I - \beta v v^T \quad \text{donde } \beta = \frac{2}{\|v\|_2^2}$$
+
+El proceso se repite columna por columna de manera recursiva en subbloques cada vez más pequeños, y la matriz $Q_k$ se define como:
+$$Q_k = \begin{pmatrix} I_{k-1} & 0 \\ 0 & P_k \end{pmatrix}$$
+
+Luego $Q = Q_1 Q_2 \cdots Q_n$ y $R = Q_n \cdots Q_2 Q_1 A$.
+
+---
+
+# Estabilidad Numérica
+
+- Para evitar errores numéricos, se puede pensar en la primera componente de $u$ como: 
+
+$$u_1 = x_1 - \|x\|_2 = \frac{x_1^2 - \|x\|_2^2}{x_1 + \|x\|_2} = - \frac{\sum_{i=2}^m x_i^2}{x_1 + \|x\|_2} $$
+
+- Luego podemos hacer que $u_1 = 1$, entonces:
+
+$$u = \frac{x}{\gamma} = \begin{pmatrix} 1 \\ \frac{x_2}{\gamma} \\ \vdots \\ \frac{x_m}{\gamma} \end{pmatrix}, \quad \gamma = \begin{cases} x_1 - \|x\|_2 & \text{si } x_1 \le 0 \\ -\frac{\sum_{i=2}^m x_i^2}{x_1 + \|x\|_2} & \text{si } x_1 > 0 \end{cases}$$
+
+- Luego $Q = I - \rho u u^T$ con $\rho = 2 \gamma^2 / (\gamma^2 + \sum_{i=2}^m x_i^2)$.
+
+---
+
+# Algoritmo **(Reflexión de Householder)**
+
+**Entrada:** $x \in \mathbb{R}^m$. **Salidas:** $u \in \mathbb{R}^m, \ \rho \in \mathbb{R}$ tal que $I - \rho u u^T x = \sigma e_1$
+
+- Definir $\sigma = \sum_{i=2}^m x_i^2$
+- Si $\sigma = 0$, **retornar** $u = 0, \ \rho = 0$
+- Definir $\mu = \sqrt{\sigma + x_1^2}$
+- Si $x_1 \le 0$, definir $\gamma = x_1 - \mu$, sino definir $\gamma = -\sigma / (x_1 + \mu)$
+- Definir $\rho = 2 \gamma^2 / (\sigma + \gamma^2)$
+- **Retornar** $u = \begin{bmatrix} 1, & x_2 / \gamma, & \dots, & x_m / \gamma \end{bmatrix}^T$ y $\rho$
+
+---
+
+# Algoritmo **(Desc. QR por Refl. de Householder)**
+
+**Entrada:** $A \in \mathbb{R}^{m \times n}$. **Salidas:** $Q \in \mathbb{R}^{m \times m}$ ortogonal, $
+R \in \mathbb{R}^{m \times n}$ triangular superior
+- Definir $Q = I$, $p = \text{min}(m, n)$
+- Para $j = 1 \dots p$, definir $\mathcal{I} = \{j, \dots, m\}$, $\mathcal{J} = \{j, \dots, n\}$
+  - $u, \rho$ = Householder($A_{\mathcal{I}, j}$)
+  - $w = \rho u$
+  - $A_{\mathcal{I}, \mathcal{J}} \leftarrow A_{\mathcal{I}, \mathcal{J}} - w (u^T A_{\mathcal{I}, \mathcal{J}})$ 
+  - $Q_{\mathcal{I}, *} \leftarrow Q_{*, \mathcal{I}} - (Q_{*, \mathcal{I}} w) u^T$  
+- **Retornar:** $Q$, $R = A$
+
+---
+
+# Implementación Práctica
+
+- Dónde se metió $P$? :eyes:
+- Formar explícitamente la matriz de Householder requiere $O(m^2)$ de memoria y $O(m^2 n)$ de operaciones inútiles.
+- Explotamos que es una matriz de rango 1 para aplicarla directamente sobre $A$:
+  $$PA = (I - \beta v v^T)A = A - \beta v (v^T A)$$
+
+- Este procedimiento reduce el costo a **$2mn$ flops** por aplicación de reflector.
+
+---
+
+# Conteo Operacional (Crear R)
+
+Sumamos el costo de las actualizaciones de rango 1 en cada paso $k$ de dimensión decreciente $m' = m-k+1$ y $n' = n-k+1$:
+
+- **Multiplicación vector-matriz ($w^T = v^T A'$):** $\approx 2m'n'$ flops.
+- **Actualización de rango 1 ($A' - \beta v w^T$):** $\approx 2m'n'$ flops.
+- **Costo total por paso $k$:** $\approx 4(m-k+1)(n-k+1)$ flops.
+
+Sumando desde $k=1$ hasta $n$, obtenemos el costo $2mn^2 - \frac{2}{3}n^3$ flops.
+
+- Si $m = n$, el costo es de $\frac{4}{3}n^3$ flops.
+- Si $m \gg n$, el término $2mn^2$ domina, con un costo aproximado de $2mn^2$ flops.
+
+---
+
+# Algo para notar sobre Q
+
+- En el algoritmo estamos construyendo $Q$, pero en realidad no necesitamos construirla.
+
+- En su lugar, guardamos el vector de Householder $u_k$ dentro de las posiciones que se acaban de anular por debajo de la diagonal (_pierdo información?_).
+
+- El escalar $\rho_k$ se guarda de forma paralela en un vector auxiliar de tamaño $n$.
+
+- Si necesitamos multiplicar por $Q^T$, aplicamos la secuencia de actualizaciones:
+
+$$Q^T b = (Q_n \cdots Q_2 Q_1) b $$
+
+---
+
+# Householder vs. Givens: ¿Cuándo usar cuál?
+
+| Característica | 🔨 **Householder** *(El Martillo)* | 🔪 **Givens** *(El Bisturí)* |
+| :--- | :--- | :--- |
+| **Acción** | Anula **toda una subcolumna** en un solo paso. | Anula **un único elemento** a la vez (afecta 2 filas). |
+| **Geometría** | Reflexión respecto a un hiperplano. | Rotación plana en 2D. |
+| **Uso Ideal** | Matrices **densas** (más rápido y estable). | Matrices **dispersas**, en banda o estructuradas. |
+
+---
+
