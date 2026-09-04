@@ -25,7 +25,10 @@ Las diapositivas teóricas se encuentran escritas en formato Markdown preparadas
 | **02** | **Descomposición de Cholesky**<br>• Sistemas Simétricos Definidos Positivos (SDP).<br>• Teoremas de existencia y propiedades.<br>• Algoritmo de Cholesky (producto externo). | [Slide Markdown](clases/02/02_descomposicion_cholesky.md) | [Descargar PDF](clases/02/02_descomposicion_cholesky.pdf) | • Pizarra digital: [pizarra.pdf](clases/02/pizarra.pdf)<br>• Gráfico: [cholesky_prod_ext.png](clases/02/cholesky_prod_ext.png) |
 | **03** | **Cholesky y Eliminación Gaussiana**<br>• Costo de Cholesky y aplicación práctica (Ec. del Calor 2D).<br>• Algoritmo de Eliminación Gaussiana tradicional.<br>• Operaciones elementales y matrices multiplicadoras. | [Slide Markdown](clases/03/03_cholesky_gauss.md) | [Descargar PDF](clases/03/03_cholesky_gauss.pdf) | • Pizarra digital: [pizarra.pdf](clases/03/pizarra.pdf)<br>• Código de prueba: [cholesky_circumference.py](clases/03/cholesky_circumference.py)<br>• Gráfico Ec. Calor: [ec_calor.png](clases/03/ec_calor.png)<br>• Ilustración: [cholesky.webp](clases/03/cholesky.webp) |
 | **04** | **Descomposición LU Tradicional y con Pivoteo**<br>• Formulación de la descomposición LU.<br>• Algoritmo LU in-place.<br>• Inestabilidad numérica y pivoteo parcial (matriz de permutación). | [Slide Markdown](clases/04/04_lu_pivoteo.md) | [Descargar PDF](clases/04/04_lu_pivoteo.pdf) | • Pizarra digital: [pizarra.pdf](clases/04/pizarra.pdf)<br>• Test de inestabilidad: [inestabilidad_lu.py](clases/04/inestabilidad_lu.py)<br>• Esquema de almacenamiento: [esquema_lu_inplace.png](clases/04/esquema_lu_inplace.png) |
-| **05** | **Sensibilidad de Sistemas Lineales**<br>• Estabilidad numérica e introducción de normas vectoriales y matriciales.<br>• Axiomas de normas y normas inducidas.<br>• Número de condición de una matriz. | [Slide Markdown](clases/05/05_sensibilidad_sistemas_lineales.md) | *(No disponible)* | • N/A |
+| **05** | **Sensibilidad de Sistemas Lineales**<br>• Estabilidad numérica e introducción de normas vectoriales y matriciales.<br>• Axiomas de normas y normas inducidas.<br>• Número de condición de una matriz. | [Slide Markdown](clases/05/05_sensibilidad_sistemas_lineales.md) | [Descargar PDF](clases/05/05_sensibilidad_sistemas_lineales.pdf) | • Test de mal condicionamiento: [ejemplo_mal_condicionamiento.py](clases/05/ejemplo_mal_condicionamiento.py)<br>• Gráfico de normas: [compara_normas.png](clases/05/compara_normas.png) |
+| **06** | **Errores Numéricos y Residuos Mínimos**<br>• Normas matriciales y norma dual.<br>• Análisis de errores y cota del error en función de $\kappa(A)$.<br>• Introducción a residuos mínimos y matrices ortogonales. | [Slide Markdown](clases/06/06_errores_numericos_residuos_minimos.md) | [Descargar PDF](clases/06/06_errores_numericos_residuos_minimos.pdf) | • Pizarra digital QR: [pizarra_descomposicion_qr.pdf](clases/06/pizarra_descomposicion_qr.pdf) |
+| **07** | **Descomposición QR**<br>• Transformaciones ortogonales en mínimos cuadrados.<br>• Rotaciones de Givens.<br>• Transformaciones y reflexiones de Householder. | [Slide Markdown](clases/07/07_descomposicion_qr.md) | [Descargar PDF](clases/07/07_descomposicion_qr.pdf) | • Pizarra digital: [pizarra.pdf](clases/07/pizarra.pdf)<br>• Gráficos: [definicion_ortogonal.png](clases/07/definicion_ortogonal.png), [rotacion.png](clases/07/rotacion.png), [solucion_cuadrados_minimos.png](clases/07/solucion_cuadrados_minimos.png) |
+| **08** | **QR, Cuadrados Mínimos y Estabilidad**<br>• Algoritmo de Householder y QR completo.<br>• Resolución de sistemas sobredeterminados (Mínimos Cuadrados).<br>• Teorema de estabilidad de QR vs. Ecuaciones Normales.<br>• Comparación LU vs. QR. | [Slide Markdown](clases/08/qr_cuadrados_minimos.md) | [Descargar PDF](clases/08/qr_cuadrados_minimos.pdf) | • Script interactivo Givens: [qr_givens_interactivo.py](clases/08/qr_givens_interactivo.py)<br>• Demostración de estabilidad: [estabilidad_qr_vs_normales.py](clases/08/estabilidad_qr_vs_normales.py) |
 
 ---
 
@@ -48,6 +51,20 @@ Sección con las guías de prácticos oficiales y los códigos y cuadernos Jupyt
   * [ejercicio_2.ipynb](practicos/practico1/ejercicio_2.ipynb) - Resolución y simulaciones del Ejercicio 2 en Jupyter Notebook.
   * [ejercicio_4.ipynb](practicos/practico1/ejercicio_4.ipynb) - Resolución detallada del Ejercicio 4 en Jupyter Notebook.
   * [ejercicio_5.py](practicos/practico1/ejercicio_5.py) - Script de soporte con la resolución del Ejercicio 5.
+
+#### [📂 Práctico 2](practicos/practico2/) (Sensibilidad, Normas y LU)
+* 📄 Enunciado oficial de la guía: [practico_2.pdf](practicos/practico2/practico_2.pdf)
+* 💻 Ejercicios resueltos:
+  * [ejercicio_1.ipynb](practicos/practico2/ejercicio_1.ipynb) - Resolución en Jupyter Notebook del Ejercicio 1.
+  * [ejercicio_2.ipynb](practicos/practico2/ejercicio_2.ipynb) - Resolución en Jupyter Notebook del Ejercicio 2.
+  * [ejercicio_3.ipynb](practicos/practico2/ejercicio_3.ipynb) - Resolución en Jupyter Notebook del Ejercicio 3.
+  * [ejercicio_5.py](practicos/practico2/ejercicio_5.py) - Solución del Ejercicio 5 en script de Python.
+
+#### [📂 Práctico 3](practicos/practico3/) (Ortogonalidad, QR y Mínimos Cuadrados)
+* 📄 Enunciado oficial de la guía: [practico_3.pdf](practicos/practico3/practico_3.pdf)
+* 📊 Datasets y archivos adjuntos:
+  * [A_dataset.txt](practicos/practico3/A_dataset.txt) - Matriz de datos para ejercicios de mínimos cuadrados.
+  * [b_dataset.txt](practicos/practico3/b_dataset.txt) - Vector de términos independientes.
 
 ---
 
