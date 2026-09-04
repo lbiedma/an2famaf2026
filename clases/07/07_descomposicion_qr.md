@@ -192,7 +192,7 @@ Para realizar una factorización QR en una matriz $m \times n$, debemos anular t
 
 # Teorema (Descomposición QR)
 
-Sea $A \in \mathbb{R}^{m \times n}$. Entonces existe una matriz ortogonal $Q \in \mathbb{R}^{m \times m}$ y una matriz triangular superior $R \in \mathbb{R}^{n \times n}$ con $r_{ii} > 0$ para todo $i = 1 \dots n$, tales que $A = QR$.
+Sea $A \in \mathbb{R}^{m \times n}$. Entonces existe una matriz ortogonal $Q \in \mathbb{R}^{m \times m}$ y una matriz triangular superior $R \in \mathbb{R}^{m \times n}$ con $r_{ii} > 0$ para todo $i = 1 \dots n$, tales que $A = QR$.
 
 **Demostración: ya lo hicimos! :D**
 
@@ -287,70 +287,3 @@ $$u = \frac{x}{\gamma} = \begin{pmatrix} 1 \\ \frac{x_2}{\gamma} \\ \vdots \\ \f
 - Si $x_1 \le 0$, definir $\gamma = x_1 - \mu$, sino definir $\gamma = -\sigma / (x_1 + \mu)$
 - Definir $\rho = 2 \gamma^2 / (\sigma + \gamma^2)$
 - **Retornar** $u = \begin{bmatrix} 1, & x_2 / \gamma, & \dots, & x_m / \gamma \end{bmatrix}^T$ y $\rho$
-
----
-
-# Algoritmo **(Desc. QR por Refl. de Householder)**
-
-**Entrada:** $A \in \mathbb{R}^{m \times n}$. **Salidas:** $Q \in \mathbb{R}^{m \times m}$ ortogonal, $
-R \in \mathbb{R}^{m \times n}$ triangular superior
-- Definir $Q = I$, $p = \text{min}(m, n)$
-- Para $j = 1 \dots p$, definir $\mathcal{I} = \{j, \dots, m\}$, $\mathcal{J} = \{j, \dots, n\}$
-  - $u, \rho$ = Householder($A_{\mathcal{I}, j}$)
-  - $w = \rho u$
-  - $A_{\mathcal{I}, \mathcal{J}} \leftarrow A_{\mathcal{I}, \mathcal{J}} - w (u^T A_{\mathcal{I}, \mathcal{J}})$ 
-  - $Q_{\mathcal{I}, *} \leftarrow Q_{*, \mathcal{I}} - (Q_{*, \mathcal{I}} w) u^T$  
-- **Retornar:** $Q$, $R = A$
-
----
-
-# Implementación Práctica
-
-- Dónde se metió $P$? :eyes:
-- Formar explícitamente la matriz de Householder requiere $O(m^2)$ de memoria y $O(m^2 n)$ de operaciones inútiles.
-- Explotamos que es una matriz de rango 1 para aplicarla directamente sobre $A$:
-  $$PA = (I - \beta v v^T)A = A - \beta v (v^T A)$$
-
-- Este procedimiento reduce el costo a **$2mn$ flops** por aplicación de reflector.
-
----
-
-# Conteo Operacional (Crear R)
-
-Sumamos el costo de las actualizaciones de rango 1 en cada paso $k$ de dimensión decreciente $m' = m-k+1$ y $n' = n-k+1$:
-
-- **Multiplicación vector-matriz ($w^T = v^T A'$):** $\approx 2m'n'$ flops.
-- **Actualización de rango 1 ($A' - \beta v w^T$):** $\approx 2m'n'$ flops.
-- **Costo total por paso $k$:** $\approx 4(m-k+1)(n-k+1)$ flops.
-
-Sumando desde $k=1$ hasta $n$, obtenemos el costo $2mn^2 - \frac{2}{3}n^3$ flops.
-
-- Si $m = n$, el costo es de $\frac{4}{3}n^3$ flops.
-- Si $m \gg n$, el término $2mn^2$ domina, con un costo aproximado de $2mn^2$ flops.
-
----
-
-# Algo para notar sobre Q
-
-- En el algoritmo estamos construyendo $Q$, pero en realidad no necesitamos construirla.
-
-- En su lugar, guardamos el vector de Householder $u_k$ dentro de las posiciones que se acaban de anular por debajo de la diagonal (_pierdo información?_).
-
-- El escalar $\rho_k$ se guarda de forma paralela en un vector auxiliar de tamaño $n$.
-
-- Si necesitamos multiplicar por $Q^T$, aplicamos la secuencia de actualizaciones:
-
-$$Q^T b = (Q_n \cdots Q_2 Q_1) b $$
-
----
-
-# Householder vs. Givens: ¿Cuándo usar cuál?
-
-| Característica | 🔨 **Householder** *(El Martillo)* | 🔪 **Givens** *(El Bisturí)* |
-| :--- | :--- | :--- |
-| **Acción** | Anula **toda una subcolumna** en un solo paso. | Anula **un único elemento** a la vez (afecta 2 filas). |
-| **Geometría** | Reflexión respecto a un hiperplano. | Rotación plana en 2D. |
-| **Uso Ideal** | Matrices **densas** (más rápido y estable). | Matrices **dispersas**, en banda o estructuradas. |
-
----
-
