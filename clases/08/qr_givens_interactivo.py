@@ -56,6 +56,10 @@ def qr_givens_demo(A_orig):
     print("\nFactor Q (Ortogonal):")
     print(np.round(Q, 4))
 
+    print("\nChequeo Q Ortogonal")
+    print(f"Q Q^T = {Q@Q.T}")
+    print(np.allclose(Q @ Q.T, np.eye(m)))
+
 if __name__ == "__main__":
     # Matriz con primera columna pitagórica [3-5]^T (Norma = 13)
     A = np.array([[3.0,  5.0,  1.0],

@@ -11,14 +11,14 @@ style: |
 ---
 
 # Análisis Numérico II / Álgebra Lineal Numérica
-## Clase 07: Descomposición QR
+## Clase 08: QR por Householder y Cuadrados Mínimos
 ![height:50%](https://www.famaf.unc.edu.ar/documents/3264/Logo_FAMAF_UNC_color.png)
 
 ---
 
 # Algoritmo **(Reflexión de Householder)**
 
-**Entrada:** $x \in \mathbb{R}^m$. **Salidas:** $u \in \mathbb{R}^m, \ \rho \in \mathbb{R}$ tal que $I - \rho u u^T x = \sigma e_1$
+**Entrada:** $x \in \mathbb{R}^m$. **Salidas:** $u \in \mathbb{R}^m, \ \rho \in \mathbb{R}$ tal que $I - \rho u u^T x = \sigma e^1$
 
 - Definir $\sigma = \sum_{i=2}^m x_i^2$
 - Si $\sigma = 0$, **retornar** $u = 0, \ \rho = 0$
@@ -38,7 +38,7 @@ R \in \mathbb{R}^{m \times n}$ triangular superior
   - $u, \rho$ = Householder($A_{\mathcal{I}, j}$)
   - $w = \rho u$
   - $A_{\mathcal{I}, \mathcal{J}} \leftarrow A_{\mathcal{I}, \mathcal{J}} - w (u^T A_{\mathcal{I}, \mathcal{J}})$ 
-  - $Q_{\mathcal{I}, *} \leftarrow Q_{*, \mathcal{I}} - (Q_{*, \mathcal{I}} w) u^T$  
+  - $Q_{*, \mathcal{I}} \leftarrow Q_{*, \mathcal{I}} - (Q_{*, \mathcal{I}} w) u^T$  
 - **Retornar:** $Q$, $R = A$
 
 ---
