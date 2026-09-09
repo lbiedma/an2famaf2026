@@ -4,7 +4,7 @@ import sys
 sys.path.append('..')
 
 from practico1.ejercicio_1b import sol_trisup_col
-from ejercicio_10 import egaussp
+from practico2.ejercicio_10 import egaussp
 
 
 def sol_egauss(A,b):
