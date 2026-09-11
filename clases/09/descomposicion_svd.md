@@ -317,6 +317,3 @@ $$ \|A_k - A\|_2 = \|U^T (A_k - A) V\|_2 = \|\tilde{\Sigma}_k\|_2 = \sigma_{k+1}
 - Si aplicamos ese procedimiento, el error introducido es el menor posible para el rango de matrices del mismo tamaño.
 - Este hecho es muy importante para la disciplina del **Machine Learning** y da lugar al llamado **"Análisis de Componentes Principales"** (PCA).
 - También es una forma de **compresión de datos**... DEMO
-
----
-
