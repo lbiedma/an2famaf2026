@@ -123,19 +123,16 @@ Como $B = Q^T A Q$ con $\text{off}(B) \le \epsilon$, el teorema nos garantiza qu
 
 ---
 
-### Cálculo de Autovalores: Aplicaciones
+# Cálculo de Autovalores: Aplicaciones
 
-Los autovalores y autovectores caracterizan las direcciones donde una matriz actúa como un escalar: $Av = \lambda v$.
-
-- **Diagonalización:** $A = X \Lambda X^{-1}$ proporciona una representación canónica que simplifica la estructura de la transformación.
-- **Operaciones y funciones matriciales:** Permite calcular fácilmente potencias y funciones generales de matrices:
+- **Operaciones y funciones matriciales:** Si la matriz es diagonalizable, podemos calcular fácilmente potencias y funciones generales de matrices:
   $$A^k = X \Lambda^k X^{-1}, \qquad f(A) = X f(\Lambda) X^{-1}$$
 - **Sistemas Dinámicos:** La solución de $\frac{dx}{dt} = M x$ es $x(t) = \exp(Mt) x_0$. La estabilidad a largo plazo depende de los términos $\exp(\lambda_i t)$.
 - **Enfoque numérico:** Resolver $\det(A - \lambda I) = 0$ **no** es estable ni escalable para matrices generales.
 
 ---
 
-### El Desafío: No Existe Solución Directa
+# No Existe Solución Directa
 
 - A diferencia de resolver $Ax = b$ con eliminación Gaussiana ($LU$), **no existe un método directo** (fórmula finita) para calcular los autovalores de una matriz general de $n \times n$ para $n \ge 5$.
 - La dificultad radica en la conexión fundamental entre autovalores y las **raíces de polinomios**.
@@ -143,39 +140,33 @@ Los autovalores y autovectores caracterizan las direcciones donde una matriz act
 
 ---
 
-### La Necesidad de Métodos Iterativos
+# La Necesidad de Métodos Iterativos
 
-- **Teorema de Abel-Ruffini (Siglo XIX):**
-  No existe una fórmula general por radicales (análoga a la fórmula cuadrática) para polinomios de grado 5 o mayor.
+- **Teorema de Abel-Ruffini (Siglo XIX):** No existe una fórmula general por radicales (análoga a la fórmula cuadrática) para polinomios de grado 5 o mayor.
 
 - **Consecuencias:**
-  1. Si existiera un método directo y exacto para autovalores, resolvería de forma exacta cualquier polinomio (vía su matriz compañera).
+  1. Si existiera un método directo y exacto para autovalores, resolvería de forma exacta cualquier polinomio.
   2. Como Abel-Ruffini demuestra que esto es imposible, **no puede existir un algoritmo directo y exacto** para matrices generales.
-  3. Por lo tanto, los métodos para calcular autovalores son necesariamente **iterativos**.
+  3. Entonces los métodos para calcular autovalores son necesariamente **iterativos**.
 
 - **En la práctica:** Los algoritmos iterativos convergen muy velozmente a precisión de máquina, siendo indistinguibles de una solución exacta.
 
 ---
 
-# Método de Potencias
-
----
-
-### Método de Potencias: Intuición
+# Método de las Potencias: Intuición
 
 El **método de las potencias** busca el autovalor **estrictamente dominante** (mayor magnitud) y su autovector asociado.
 
-- Consideremos la matriz $A$ como una transformación lineal. Un vector inicial arbitrario $q$ puede escribirse como combinación lineal de los autovectores:
+- Consideremos $A$ diagonalizable. Un vector $q$ puede escribirse como combinación lineal de los autovectores:
   $$q = c_1 x_1 + c_2 x_2 + \dots + c_n x_n$$
 - Aplicando la transformación $A$ sucesivamente $k$ veces:
   $$A^k q = c_1 \lambda_1^k x_1 + c_2 \lambda_2^k x_2 + \dots + c_n \lambda_n^k x_n$$
-- Si $|\lambda_1| > |\lambda_2| \ge \dots$, el término $\lambda_1^k$ crecerá mucho más rápido que los demás. Para $k$ grande:
+- Si $|\lambda_1| > |\lambda_2| \ge \dots$, el término $\lambda_1^k$ crece más rápido. Para $k$ grande:
   $$A^k q \approx c_1 \lambda_1^k x_1$$
-- El vector resultante queda prácticamente alineado con el autovector dominante $x_1$.
 
 ---
 
-### Método de Potencias: Derivación Formal
+# Método de las Potencias: Derivación Formal
 
 - **Hipótesis:**
   1. $A \in \mathbb{C}^{n \times n}$ es diagonalizable con base de autovectores $\{x_1, \dots, x_n\}$.
@@ -186,7 +177,7 @@ El **método de las potencias** busca el autovalor **estrictamente dominante** (
 
 ---
 
-### Método de Potencias: Convergencia
+# Método de las Potencias: Convergencia
 
 - Analizamos el vector $z_k = A^k q_0$:
   $$z_k = A^k \left(\sum_{i=1}^n c_i x_i\right) = \sum_{i=1}^n c_i \lambda_i^k x_i$$
