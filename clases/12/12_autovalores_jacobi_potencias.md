@@ -155,34 +155,172 @@ Como $B = Q^T A Q$ con $\text{off}(B) \le \epsilon$, el teorema nos garantiza qu
 
 # Método de las Potencias: Intuición
 
-El **método de las potencias** busca el autovalor **estrictamente dominante** (mayor magnitud) y su autovector asociado.
+El **método de las potencias** busca el autovalor $\lambda_1$ **estrictamente dominante** (mayor magnitud) y su autovector $v^1$ asociado.
 
 - Consideremos $A$ diagonalizable. Un vector $q$ puede escribirse como combinación lineal de los autovectores:
-  $$q = c_1 x_1 + c_2 x_2 + \dots + c_n x_n$$
+  $$q = c_1 v^1 + c_2 v^2 + \dots + c_n v^n$$
 - Aplicando la transformación $A$ sucesivamente $k$ veces:
-  $$A^k q = c_1 \lambda_1^k x_1 + c_2 \lambda_2^k x_2 + \dots + c_n \lambda_n^k x_n$$
+  $$A^k q = c_1 \lambda_1^k v^1 + c_2 \lambda_2^k v^2 + \dots + c_n \lambda_n^k v^n$$
 - Si $|\lambda_1| > |\lambda_2| \ge \dots$, el término $\lambda_1^k$ crece más rápido. Para $k$ grande:
-  $$A^k q \approx c_1 \lambda_1^k x_1$$
+  $$A^k q \approx c_1 \lambda_1^k v^1$$
 
 ---
 
 # Método de las Potencias: Derivación Formal
 
 - **Hipótesis:**
-  1. $A \in \mathbb{C}^{n \times n}$ es diagonalizable con base de autovectores $\{x_1, \dots, x_n\}$.
+  1. $A \in \mathbb{C}^{n \times n}$ es diagonalizable con base de autovectores $\{v^1, \dots, v^n\}$.
   2. Existe un **autovalor estrictamente dominante**:
      $$|\lambda_1| > |\lambda_2| \ge |\lambda_3| \ge \dots \ge |\lambda_n|$$
-  3. Elegimos un vector inicial $q_0 = \sum_{i=1}^n c_i x_i$ tal que $c_1 \ne 0$.
+  3. Elegimos un vector inicial $q_0 = \sum_{i=1}^n c_i v^i$ tal que $c_1 \ne 0$.
      *(Elegir $q_0$ aleatorio garantiza esto casi seguramente).*
 
 ---
 
-# Método de las Potencias: Convergencia
+# Método de las Potencias: Detalles
 
 - Analizamos el vector $z_k = A^k q_0$:
   $$z_k = A^k \left(\sum_{i=1}^n c_i x_i\right) = \sum_{i=1}^n c_i \lambda_i^k x_i$$
 - Factorizando el término dominante $\lambda_1^k$:
   $$z_k = \lambda_1^k \left( c_1 x_1 + \sum_{i=2}^n c_i \left(\frac{\lambda_i}{\lambda_1}\right)^k x_i \right)$$
+- Qué pasa con $lim_{k\rightarrow \infty} (\lambda_i / \lambda_1)^k$?
+
+---
+
+# En la Práctica
+
+- Calcular $A^k q_0$ de forma directa es **numéricamente inestable**.
+  - Si $|\lambda_1| > 1$, el vector $z_k$ **desborda** (*overflow*).
+  - Si $|\lambda_1| < 1$, **subdesborda** a cero (*underflow*).
+- **Solución:** normalizar el vector en **cada** iteración.
+  - La norma se mantiene en $1$.
+  - Solo se conserva la **dirección**, que es lo que nos interesa.
+  - Con $q$ unitario, el autovalor se estima con el **cociente de Rayleigh**:
+    $$R(A, q) = \frac{q^H A q}{q^H q} = q^H A q.$$
+    Si $q$ es autovector, $R(A, q) = \lambda$.
+
+---
+
+# Algoritmo *(Iteración de potencias Norma 2)*
+
+**Entrada:** $A \in \mathbb{C}^{n \times n}$. **Salidas:** $\lambda \in \mathbb{C}$ y $q \in \mathbb{C}^n$.
+
+1. Elegir un vector unitario aleatorio $q$ (i.e., $\|q\|_2 = 1$).
+2. Iterar hasta convergencia (p. ej., hasta que $\lambda$ deje de cambiar):
+   1. $z = A q$
+   2. $\lambda = q^H z$ (estimar el autovalor con el **cociente de Rayleigh**)
+   3. $q = z / \|z\|_2$ (normalizar para la siguiente iteración)
+3. Retornar $\lambda$ (autovalor dominante) y $q$ (autovector dominante).
+
+---
+
+# Teorema (Error del cociente de Rayleigh)
+
+Sea $A \in \mathbb{C}^{n \times n}$ tal que $Av = \lambda v$ con $\|v\|_2 = 1$, y sea $\rho = q^H A q$ con $q^H q = \|q\|_2^2 = 1$. Entonces
+$$|\lambda - \rho| \le 2\|A\|_2 \|v - q\|_2.$$
+
+**Demostración.** Como $v^H A v = \lambda \|v\|_2^2 = \lambda$,
+$$\lambda - \rho = v^H A v - q^H A q = v^H A(v - q) + (v - q)^H A q.$$
+Por lo tanto,
+$$|\lambda - \rho| \le \|v\|_2 \|A\|_2 \|v - q\|_2 + \|v - q\|_2 \|A\|_2 \|q\|_2 = 2\|A\|_2 \|v - q\|_2.$$
+
+---
+
+# Método de las Potencias: Convergencia
+
 - Dado que $|\lambda_i / \lambda_1| < 1$ para todo $i \ge 2$, cuando $k \to \infty$:
   $$\left(\frac{\lambda_i}{\lambda_1}\right)^k \to 0 \implies z_k \approx \lambda_1^k c_1 x_1$$
 - **Velocidad de convergencia:** El error decae según la razón $|\lambda_2 / \lambda_1|^k$. Cuanto más separada esté $\lambda_1$ de $\lambda_2$, más rápida será la convergencia.
+- Vamos siempre al autovalor dominante, qué hacemos con el resto? :thinking:
+
+---
+
+# Deflación: Quitar la Primera Dirección
+
+Supongamos que el método de las potencias encontró **exactamente** el autovector unitario dominante $q^1$. La matriz
+$$P_1 = I - q^1 (q^1)^H$$
+es la **proyección ortogonal sobre el complemento** de esa dirección.
+
+- Idea: aplicar el método de las potencias a una matriz **deflacionada**, donde $\lambda_1$ ya no es dominante.
+- En particular, $P_1 A q^1 = 0$: la dirección dominante fue **eliminada**.
+
+---
+
+# La Siguiente Dirección
+
+En general $q^2$ **no** es autovector de $A$: $A q^2$ puede tener componente en $q^1$. Si $\operatorname{span}\{q^1,q^2\}$ es invariante y $q^2 \perp q^1$,
+$$A q^2 = t_{12} q^1 + \lambda_2 q^2.$$
+
+La proyección elimina el primer término y deja intacto el segundo:
+$$P_1 A q^2 = \lambda_2 q^2.$$
+
+- $q^2$ **no** tiene por qué ser autovector de $A$.
+- **Sí** es autovector de $P_1 A$, con autovalor $\lambda_2$.
+- Esta es la idea central de la **deflación**.
+
+---
+
+# Quitar Varias Direcciones
+
+Si ya conocemos las primeras $i$ direcciones (ortonormales), las reunimos en
+$$Q_i = [q^1,\ldots,q^i], \qquad P_i = I - Q_i Q_i^H.$$
+
+- El subíndice $i$ cuenta columnas.
+- La **matriz deflacionada** es $M_i = P_i A$.
+- El subespacio $\operatorname{span}\{q^1,\ldots,q^i\}$ es invariante, así que $P_i A Q_i = 0$.
+- En consecuencia, $P_i A = P_i A P_i$: $M_i$ descarta el subespacio conocido y actúa en su complemento ortogonal.
+
+---
+
+# Teorema (Deflación exacta)
+
+Para $1 \le i < n$, los autovalores de $M_i$ son $i$ ceros seguidos de $\lambda_{i+1},\ldots,\lambda_n$, contados con multiplicidad. Además,
+$$M_i q^{i+1} = \lambda_{i+1} q^{i+1}.$$
+
+### Demostración
+Toda $A$ es unitariamente semejante a una matriz **triangular superior**: existe $Q$ unitaria con
+$$Q^H A Q = T = \begin{pmatrix} T_{11} & T_{12} \\ 0 & T_{22} \end{pmatrix},$$
+particionada después de las primeras $i$ filas y columnas. En esta base, $P_i$ anula las primeras $i$ coordenadas:
+
+---
+
+### Demostración
+
+$$
+\begin{aligned}
+Q^H P_i Q &= \begin{pmatrix} 0 & 0 \\ 0 & I_{n-i} \end{pmatrix}, \\
+Q^H M_i Q &= \begin{pmatrix} 0 & 0 \\ 0 & I_{n-i} \end{pmatrix}
+\begin{pmatrix} T_{11} & T_{12} \\ 0 & T_{22} \end{pmatrix}
+= \begin{pmatrix} 0 & 0 \\ 0 & T_{22} \end{pmatrix}.
+\end{aligned}
+$$
+Esta matriz triangular superior tiene los autovalores anunciados. Su primera coordenada restante es autovector con autovalor $\lambda_{i+1}$.
+
+---
+
+# Iteración de Potencias en el Subespacio Restante
+
+Si hay **brecha estricta**, $\lambda_{i+1}$ es el autovalor **estrictamente dominante** de $M_i$.
+
+Partimos de un vector unitario $v^0$ **ortogonal** a las direcciones ya conocidas y repetimos
+$$
+\begin{aligned}
+w^{\ell+1} &= A v^\ell - Q_i\bigl(Q_i^H A v^\ell\bigr), \\
+v^{\ell+1} &= \frac{w^{\ell+1}}{\|w^{\ell+1}\|_2}.
+\end{aligned}
+$$
+
+- **No** hace falta formar $P_i$ ni $M_i$.
+- Multiplicamos por $A$, restamos la proyección al subespacio conocido y normalizamos.
+
+---
+
+# Construcción Inductiva
+
+- El vector inicial debe tener coeficiente no nulo en la dirección dominante de $M_i$. Un arranque aleatorio en el complemento lo garantiza con probabilidad $1$.
+- Entonces $\operatorname{span}\{v^\ell\}$ converge a $\operatorname{span}\{q^{i+1}\}$.
+- Si $i \le n-2$, el factor geométrico es $|\lambda_{i+2}/\lambda_{i+1}|$.
+- Con $n-1$ direcciones, el complemento unidimensional da la última.
+
+**Receta:** primera dirección por potencias, proyectar, repetir. Cada vector nuevo es ortogonal a los anteriores y agrandan un subespacio invariante.
+$$\lambda_j = (q^j)^H A q^j.$$
