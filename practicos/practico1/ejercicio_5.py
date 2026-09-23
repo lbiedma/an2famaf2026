@@ -29,7 +29,7 @@ B_ = np.block([[B, -I3, Z3],
                [-I3, B, -Z3],   
                [Z3, -I3, B]])  
 
-G_sol = cholesky_int(B_)
-print(f'B={B}')
-print(f'G = {G_sol}')
-print(f'G.T@G ={G_sol.T@G_sol}')
+# G_sol = cholesky_int(B_)
+# print(f'B={B}')
+# print(f'G = {G_sol}')
+# print(f'G.T@G ={G_sol.T@G_sol}')

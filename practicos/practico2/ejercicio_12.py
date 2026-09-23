@@ -6,8 +6,7 @@ sys.path.append('..')
 from practico1.ejercicio_1b import sol_trisup_col
 from practico1.ejercicio_1b import sol_trinf_col
 
-from ejercicio_10 import dlup 
-
+from practico2.ejercicio_10 import dlup 
 
 def inv_lu(A):
     n = A.shape[0]
@@ -28,4 +27,5 @@ A = np.array([[2., 10, 8, 8, 6],
                [1, 4, 1, 2, 1]])
 
 inv_A = inv_lu(A)
-print(f'I={inv_A@A}')
+
+#print(f'I={inv_A@A}')
