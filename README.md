@@ -32,6 +32,8 @@ Las diapositivas teóricas se encuentran escritas en formato Markdown preparadas
 | **09** | **Descomposición en Valores Singulares (SVD)**<br>• Los 4 subespacios fundamentales y relaciones de ortogonalidad.<br>• Existencia y formulación de la SVD ($A = U \Sigma V^T$).<br>• Relación con autovalores de $A^T A$ y $A A^T$.<br>• Normas matriciales ($\|A\|_2$, $\|A\|_F$) y valores singulares.<br>• Teorema de Eckart-Young (aproximación óptima de bajo rango).<br>• Aplicaciones: compresión de datos y PCA. | [Slide Markdown](clases/09/descomposicion_svd.md) | [Descargar PDF](clases/09/09_descomposicion_svd.pdf) | • Compresión de imágenes con SVD: [app_svd_imagen.py](clases/09/app_svd_imagen.py)<br>• Gráfico de transformación geométrica: [transformacion_svd.png](clases/09/transformacion_svd.png)<br>• Imagen de prueba: [rafa.jpg](clases/09/rafa.jpg) |
 | **10** | **SVD: Aplicaciones y Cuadrados Mínimos**<br>• Cuadrados mínimos en sistemas con deficiencia de rango.<br>• Solución de norma mínima y caracterización geométrica ($x^* \perp N(A)$).<br>• Pseudoinversa de Moore-Penrose ($A^+$).<br>• Algoritmo de resolución por SVD. | [Slide Markdown](clases/10/svd_cuadrados_minimos.md) | [Descargar PDF](clases/10/svd_cuadrados_minimos.pdf) | • Pizarra digital: [pizarra.pdf](clases/10/pizarra.pdf)<br>• Comparación de métodos de CM: [compara_cuadrados_minimos.png](clases/10/compara_cuadrados_minimos.png) |
 | **11** | **Autovalores y Autovectores**<br>• Definición formal de autovalores y autovectores en $\mathbb{C}^{n \times n}$.<br>• Repaso de fundamentos teóricos.<br>• Propiedades algebraicas y geométricas. | - | [Descargar PDF](clases/11/clase.pdf) | • Pizarra digital: [clase.pdf](clases/11/clase.pdf) |
+| **12** | **Autovalores: Métodos de Jacobi y Potencias**<br>• Método de Jacobi para diagonalización de matrices simétricas.<br>• Teorema de los Discos de Gershgorin y cotas de autovalores.<br>• Imposibilidad de métodos directos (Abel-Ruffini) y enfoque iterativo.<br>• Método de las potencias, estimación con el cociente de Rayleigh y análisis del error.<br>• Deflación ortogonal ($P_1 = I - q^1 (q^1)^H$) y cálculo de autovalores sucesivos. | [Slide Markdown](clases/12/12_autovalores_jacobi_potencias.md) | [Descargar PDF](clases/12/12_autovalores_jacobi_potencias.pdf) | • Visualizador interactivo de Jacobi: [jacobi_viz.py](clases/12/jacobi_viz.py)<br>• Pizarra digital: [pizarra.pdf](clases/12/pizarra.pdf) |
+| **13** | **Iteración QR para Autovalores y Matrices Hessenberg**<br>• De potencias a iteraciones ortogonales y formulación de la iteración QR.<br>• Descomposición de Schur en $\mathbb{C}$ y Schur real (forma cuasi-triangular).<br>• Matrices Hessenberg superior y preservación de estructura ($RQ$ Hessenberg).<br>• Reducción ortogonal a Hessenberg usando reflexiones de Householder.<br>• Factorización QR acelerada con rotaciones de Givens ($\mathcal{O}(n^2)$ por paso).<br>• Algoritmo QR práctico: desplazamientos (*shifts*) y deflación. | [Slide Markdown](clases/13/13_metodo_qr_autovalores.md) | - | • Pizarra digital: [pizarra.pdf](clases/13/pizarra.pdf) |
 
 ---
 
@@ -89,6 +91,16 @@ Sección con las guías de prácticos oficiales y los códigos y cuadernos Jupyt
   * [datos_p4ej12.npz](practicos/practico4/datos_p4ej12.npz) - Dataset comprimido en NumPy para el Ejercicio 12.
   * [y_mes1.txt](practicos/practico4/y_mes1.txt) - Mediciones del mes 1.
   * [y_mes2.txt](practicos/practico4/y_mes2.txt) - Serie de mediciones del mes 2.
+
+#### [📂 Práctico 5](practicos/practico5/) (SVD y Cuadrados Mínimos)
+* 📄 Enunciado oficial de la guía: [practico_5.pdf](practicos/practico5/practico_5.pdf)
+* 💻 Ejercicios resueltos:
+  * [ejercicio_1.ipynb](practicos/practico5/ejercicio_1.ipynb) - Resolución en Jupyter Notebook del Ejercicio 1.
+  * [ejercicio_4.py](practicos/practico5/ejercicio_4.py) - Implementación de solución de cuadrados mínimos por SVD (`cuad_min_svd`).
+* 📊 Datasets y archivos adjuntos:
+  * [A_p5e4.txt](practicos/practico5/A_p5e4.txt) y [b_p5e4.txt](practicos/practico5/b_p5e4.txt) - Matriz y vector para el Ejercicio 4.
+  * [datos_sensores.txt](practicos/practico5/datos_sensores.txt) - Dataset de mediciones de sensores.
+  * [imagen1.txt](practicos/practico5/imagen1.txt), [imagen2.txt](practicos/practico5/imagen2.txt), [imagen3.txt](practicos/practico5/imagen3.txt), [imagen4.txt](practicos/practico5/imagen4.txt) - Matrices de imágenes para compresión y procesamiento por SVD.
 
 ---
 
