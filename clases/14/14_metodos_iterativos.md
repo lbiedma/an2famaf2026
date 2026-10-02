@@ -108,7 +108,115 @@ $$\Vert{}M_J^{-1} N_J\Vert{}_\infty = \max_{1 \le i \le n} \sum_{\substack{j=1 \
 
 ---
 
-2. **Método de Gauss-Seidel:** Se toma $M_{GS} = D + L$ y $N_{GS} = -U$.
-   $$(D + L) x^{(k+1)} = -U x^{(k)} + b$$
-3. **Método SOR (Sobrerelajación Sucesiva):** Con parámetro de relajación $\omega > 0$, se toma $M_{SOR} = \frac{1}{\omega}D + L$ y $N_{SOR} = \left(\frac{1}{\omega} - 1\right)D - U$.
-   $$\left(\frac{1}{\omega}D + L\right) x^{(k+1)} = \left[\left(\frac{1}{\omega} - 1\right)D - U\right] x^{(k)} + b$$
+# Algoritmo: Iteración de Jacobi
+
+**Entradas:** $A \in \mathbb{R}^{n \times n}$, $b, x \in \mathbb{R}^n$, $\epsilon > 0$ y $m \in \mathbb{N}$. **Salida:** $x^+$ aproximación de $x^*$.
+
+1. Si $A_{ii} = 0$ para algún $i$, parar y retornar un error.  
+  Sino, para $A = L + D + U$, hacer
+  $$\begin{aligned}
+  b &\leftarrow D^{-1}b, \\
+  A &\leftarrow D^{-1}(L + U).
+  \end{aligned}$$
+
+2. Para $k = 1, \dots, m$, definir
+  $$x^+ = b - Ax.$$
+  Si $\|x^+ - x\|_\infty \le \epsilon$ ir al paso 3. Sino, hacer $x = x^+$.
+
+3. Retornar $x^+$.
+
+---
+
+# Iteración de Gauss-Seidel
+
+La iteración de Gauss-Seidel se define tomando $M_{GS} = D + L$ y $N_{GS} = -U$:
+$$M_{GS} x^{k+1} = N_{GS} x^k + b$$
+
+Escribiendo las componentes de esta ecuación, se tiene que:
+$$x_i^{k+1} = \frac{1}{a_{ii}} \left( b_i - \sum_{j=1}^{i-1} a_{ij} x_j^{k+1} - \sum_{j=i+1}^n a_{ij} x_j^k \right), \quad i = 1, \dots, n.$$
+
+- Cada componente actualizada $x_i^{k+1}$ se utiliza inmediatamente en el cálculo de las componentes siguientes dentro de la misma iteración.
+
+---
+
+# Convergencia de Gauss-Seidel
+
+Veamos que se cumple un resultado análogo al de la iteración de Jacobi:
+
+**Proposición:** Si $A \in \mathbb{R}^{n \times n}$ es diagonalmente dominante en sentido estricto entonces:
+$$\|M_{GS}^{-1} N_{GS}\|_\infty < 1.$$
+
+**Corolario:** Si $A \in \mathbb{R}^{n \times n}$ es diagonalmente dominante en sentido estricto, entonces para cualquier $x^0 \in \mathbb{R}^n$ la sucesión $\{x^k\}$ generada por la iteración de Gauss-Seidel converge a $x^*$ con $Ax^* = b$.
+
+---
+
+# Algoritmo: Iteración de Gauss-Seidel
+
+**Entradas:** $A \in \mathbb{R}^{n \times n}$, $b, x \in \mathbb{R}^n$, $\epsilon > 0$ y $k_{\text{máx}} \in \mathbb{N}$. **Salida:** $x^+$ aproximación de $x^*$.
+
+1. Si $A_{ii} = 0$ para algún $i$, parar y retornar un error.  
+  Sino, para $A = L + D + U$, hacer
+  $$\begin{aligned}
+  b &\leftarrow D^{-1}b, \\
+  A &\leftarrow D^{-1}(L + U), \\
+  x^+ &\leftarrow x.
+  \end{aligned}$$
+
+2. Para $k = 1, \dots, k_{\text{máx}}$:
+  - Para $i = 1, \dots, n$, definir $x_i^+ \leftarrow b_i - A_{i*} x^+.$
+  - Si $\|x^+ - x\|_\infty \le \epsilon$ ir al paso 3. Sino, hacer $x = x^+$.
+
+3. Retornar $x^+$.
+
+---
+
+# Iteración SOR (Sobrerelajación Sucesiva)
+
+La iteración SOR (*Successive Over Relaxation*) requiere un parámetro de relajación $\omega > 0$ y considera $M_{SOR} = \frac{1}{\omega}D + L$ y $N_{SOR} = \left(\frac{1}{\omega} - 1\right)D - U$, o sea:
+
+- Gauss-Seidel es el caso particular con $\omega = 1$.
+- **Convergencia:** Si $A$ es simétrica definida positiva y $0 < \omega < 2$, entonces:
+  $$\|M_{SOR}^{-1} N_{SOR}\| < 1$$
+  para cierta norma matricial inducida $\|\cdot\|$.
+
+---
+
+# Ventajas de los Métodos de Separación
+
+- **Aprovechamiento de la Dispersión:**
+  - Explotan naturalmente matrices ralas, evitan *fill-in* (llenado de matrices).
+  - Costo por iteración mínimo: un producto matriz-vector y resolver con $M$.
+
+- **Simplicidad Computacional y Paralelismo:**
+  - "Fácil" implementación y requisitos mínimos de memoria.
+  - Algunos de ellos son paralelizables ([por ejemplo, Jacobi](https://ericdarve.github.io/NLA/content/jacobi_method.html#implementation-and-parallelism)).
+
+- **Flexibilidad y Precondicionamiento:**
+  - La matriz $M$ actúa como matriz precondicionadora.
+  - Son piezas fundamentales para métodos modernos más robustos (soon).
+
+---
+
+# Limitaciones de los Métodos de Separación
+
+- **Garantías y Velocidad de Convergencia:**
+  - Si $\rho(M^{-1}N) \ge 1$, el método diverge.
+  - Convergencia puede ser excesivamente lenta y exigir condiciones fuertes.
+
+- **Rendimiento Subóptimo a Gran Escala:**
+  - Para sistemas lineales de gran dimensión ($n$ grande), los esquemas básicos como Jacobi o SOR son inferiores a técnicas avanzadas.
+
+- **Dificultades en Aceleración Polinomial:**
+  - Con ciertas separaciones (como en SOR), la matriz de iteración puede tener autovalores sobre círculos o distribuciones complejas, limitando la efectividad.
+
+---
+
+# Casos de Uso y Aplicaciones
+
+- **Discretización de Ecuaciones Diferenciales Parciales (EDPs):**
+  - Muy comunes al aplicar diferencias finitas o elementos finitos.
+  - Las matrices resultantes son enormes, altamente dispersas y con estructuras bien definidas (p. ej., matrices banda o diagonales dispersas).
+
+- **Precondicionadores en Métodos de Krylov:**
+  - Su uso moderno más importante: elegir $M \approx A$ fácil de invertir tal que el sistema precondicionado $M^{-1}Ax = M^{-1}b$ tenga $\kappa(M^{-1}A) \ll \kappa(A)$.
+  - Un menor número de condición acelera enormemente la convergencia de métodos como **Gradiente Conjugado** (soon) o **GMRES**.
