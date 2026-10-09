@@ -152,12 +152,12 @@ $$\|M_{GS}^{-1} N_{GS}\|_\infty < 1.$$
 
 # Algoritmo: Iteración de Gauss-Seidel
 
-**Entradas:** $A \in \mathbb{R}^{n \times n}$, $b, x \in \mathbb{R}^n$, $\epsilon > 0$ y $k_{\text{máx}} \in \mathbb{N}$. **Salida:** $x^+$ aproximación de $x^*$.
+**Entradas:** $A \in \mathbb{R}^{n \times n}$, $b, x \in \mathbb{R}^n$, $\epsilon > 0$ y $k_{\text{máx}} \in \mathbb{N}$. **Salida:** $x^+$ aprox. de $x^*$.
 
 1. Si $A_{ii} = 0$ para algún $i$, parar y retornar un error.  
   Sino, para $A = L + D + U$, hacer
   $$\begin{aligned}
-  b &\leftarrow D^{-1}b, \\
+  b &\leftarrow (L+D)^{-1}b, \\
   A &\leftarrow D^{-1}(L + U), \\
   x^+ &\leftarrow x.
   \end{aligned}$$
