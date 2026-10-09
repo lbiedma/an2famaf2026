@@ -82,7 +82,7 @@ Para resolver $Ax = b$ con $A \in \mathbb{R}^{n \times n}$ **Simétrica Definida
 
 - Buscamos una base $\{p^1, \dots, p^k\}$ tal que $\text{span}(p^1, \dots, p^k) = \mathcal{K}_k(A, b)$
 
-- Si conocemos la base y los coeficientes escalares $\mu_k$, la solución se escribe como:
+- Si conocemos la base y los coeficientes escalares $\mu_k$, la solución se escribe:
   $$x^* = \sum_{k=1}^n \mu_k p^k \quad \implies \quad x^k = \sum_{l=1}^k \mu_l p^l$$
 
 - Esto permite una **regla de actualización aditiva simple**:
@@ -216,7 +216,7 @@ Como se anula para todo $l \le k$, el residuo $r^k$ es perpendicular a todo vect
 
 # La Recurrencia Corta de Tres Términos
 
-Como $r^k \in \mathcal{K}_{k+1} = \text{span}(p^1, \dots, p^{k+1})$, podemos escribir $r^k = \sum_{l=1}^{k+1} u_{l, k+1} p^l$
+Como $r^k \in \mathcal{K}_{k+1} = \text{span}(p^1, \dots, p^{k+1})$, podemos escribir $r^k = \sum_{l=1}^{k+1} u_l p^l$
 
 Tomando producto interno-$A$ con $p^i$ para $i \le k+1$:
 $$(p^i)^T A r^k = \sum_{l=1}^{k+1} u_{l, k+1} ((p^i)^T A p^l) = u_{i, k+1} d_i \quad \implies \quad u_{i, k+1} = \frac{(A p^i)^T r^k}{d_i}$$
@@ -264,7 +264,7 @@ Calculemos ahora el coeficiente de actualización de dirección $u_{k, k+1} = \f
 - De la actualización del residuo: $r^k = r^{k-1} - \mu_k A p^k \implies A p^k = \frac{1}{\mu_k} (r^{k-1} - r^k)$
 - Sustituyendo este valor en el producto interno: $(A p^k)^T r^k = \frac{1}{\mu_k} (r^{k-1} - r^k)^T r^k = \frac{1}{\mu_k} (\underbrace{(r^{k-1})^T r^k}_{=0} - \|r^k\|_2^2) = -\frac{\|r^k\|_2^2}{\mu_k}$
 
-- Usando la relación $\mu_k d_k = \|r^{k-1}\|_2^2$: $u_{k, k+1} = \frac{-(1/\mu_k)\|r^k\|_2^2}{d_k} = -\frac{\|r^k\|_2^2}{\mu_k d_k} = -\frac{\|r^k\|_2^2}{\|r^{k-1}\|_2^2}$
+- Usando que $\mu_k d_k = \|r^{k-1}\|_2^2$: $u_{k, k+1} = \frac{-(1/\mu_k)\|r^k\|_2^2}{d_k} = -\frac{\|r^k\|_2^2}{\mu_k d_k} = -\frac{\|r^k\|_2^2}{\|r^{k-1}\|_2^2}$
 
 - Definiendo el parámetro $\tau_k = -u_{k, k+1}$: $\tau_k = \frac{\|r^k\|_2^2}{\|r^{k-1}\|_2^2}$ y por lo tanto $p^{k+1} = r^k + \tau_k p^k$
 
@@ -293,38 +293,32 @@ Calculemos ahora el coeficiente de actualización de dirección $u_{k, k+1} = \f
 Cada iteración de CG requiere un costo mínimo y estrictamente controlado:
 
 - **Operaciones por iteración:**
-  - **1 producto matriz-vector ($A p^k$):** Escala como $O(\text{nnz}(A))$. En matrices ralas o estructuradas, esto es $O(n)$ flops.
+  - **1 producto matriz-vector ($A p^k$):** En matrices ralas $O(n)$ flops.
   - **2 productos escalares:** $(p^k)^T (A p^k)$ y $\rho_k = (r^k)^T r^k$ ($O(n)$ flops).
   - **3 actualizaciones de vectores tipo saxpy:** $x^k, r^k, p^{k+1}$ ($O(n)$ flops).
 
 - **Requisitos de Almacenamiento:**
-  - Sólo requiere almacenar en memoria un puñado de vectores: $x, r, p$ y $v = Ap$.
-  - **No se almacena la base de Krylov completa ni matrices densas intermedias.**
+  - Sólo requiere almacenar en memoria vectores: $x, r, p$ y $v = Ap$.
+  - **No almacena la base de Krylov ni matrices densas intermedias.**
 
-> **Condición Crucial:** El método exige que la matriz $A$ sea **Simétrica y Definida Positiva (SDP)**. Si $A$ no es SDP, el producto $(p^k)^T A p^k$ puede anularse o hacerse negativo, y el algoritmo colapsa.
+> El método exige que $A$ sea **SDP**. Si no, el producto $(p^k)^T A p^k$ puede anularse o hacerse negativo, y estamos frit@s.
 
 ---
 
 # ¿Por qué "Gradiente Conjugado"?
 
-El nombre refleja literalmente los dos pilares teóricos del método:
-
-**1. La parte "Gradiente":**
-- CG minimiza el error en norma-$A$:
+**1. La parte "Gradiente":** CG minimiza el error en norma-$A$:
   $$L(y) = \frac{1}{2} \|x^* - y\|_A^2 = \frac{1}{2} (x^* - y)^T A (x^* - y)$$
-- El gradiente de esta función de costo respecto de $y$ es:
-  $$\nabla L(y) = Ay - Ax^* = Ay - b = -r(y)$$
-- **El residuo $r^k$ es exactamente la dirección de máximo descenso (-gradiente).**
+- Gradiente respecto de $y$: $\nabla L(y) = Ay - Ax^* = Ay - b = -r(y)$
 
-**2. La parte "Conjugado":**
-- El método de *Steepest Descent* avanza simplemente por $r^k$, pero zigzaguea penosamente cuando $\kappa(A) \gg 1$.
+**2. La parte "Conjugado":** Si sólo vamos por por $r^k$, haríamos zig zag.
 - CG corrige el gradiente sumando $\tau_k p^k$:
   $$p^{k+1} = r^k + \tau_k p^k$$
   forzando que la nueva dirección sea **$A$-ortogonal (conjugada)** a las anteriores, garantizando no deshacer el progreso ya optimizado.
 
 ---
 
-# Resumen de Relaciones Matriciales
+<!-- # Resumen de Relaciones Matriciales
 
 Definiendo las matrices cuyas columnas agrupan los vectores generados:
 - $Q = [q^1, \dots, q^n]$: Vectores ortonormales de Lanczos.
@@ -341,19 +335,17 @@ Definiendo las matrices cuyas columnas agrupan los vectores generados:
 
 > *Demostración de $R^T A R$ tridiagonal:* Como $r^j \in \mathcal{K}_{j+1}$, se tiene $A r^j \in \mathcal{K}_{j+2}$. Si $i \ge j+2$, como $r^i \perp \mathcal{K}_i$ y $\mathcal{K}_{j+2} \subset \mathcal{K}_i$, resulta $(r^i)^T A r^j = 0$. Por simetría, la banda tiene ancho 1.
 
----
+--- -->
 
 # Convergencia de Gradiente Conjugado
 
 ¿Qué tan rápido converge la aproximación hacia $x^*$?
 
-- **Convergencia Finita (Teórica):**
-  - En aritmética exacta, como los residuos no nulos son mutuamente ortogonales en $\mathbb{R}^n$, CG encuentra la solución exacta en **a lo sumo $n$ pasos**.
-  - En la práctica ($n \approx 10^5 - 10^7$), correr $n$ pasos es impensable, y los errores de redondeo destruyen la ortogonalidad exacta.
-  - El verdadero objetivo de CG es aproximar excelentemente en $k \ll n$ iteraciones.
+- En aritmética exacta, como los residuos no nulos son mutuamente ortogonales en $\mathbb{R}^n$, CG encuentra solución en **a lo sumo $n$ pasos**.
+- En la práctica ($n \approx 10^5 - 10^7$), correr $n$ pasos es impensable, y los errores de redondeo destruyen la ortogonalidad exacta.
+- El verdadero objetivo de CG es aproximar bien en $k \ll n$ iteraciones.
 
-- **Cota de Error en Función del Número de Condición:**
-  Para $A$ SDP con $\kappa(A) = \frac{\lambda_{\max}(A)}{\lambda_{\min}(A)}$, se cumple la cota clásica:
+- Para $A$ SDP con $\kappa(A) = \frac{\lambda_{\max}(A)}{\lambda_{\min}(A)}$, se cumple la cota clásica:
   $$\|x^* - x^k\|_A \le 2 \left( \frac{\sqrt{\kappa(A)} - 1}{\sqrt{\kappa(A)} + 1} \right)^k \|x^* - x^0\|_A$$
 
 ---
@@ -362,15 +354,13 @@ Definiendo las matrices cuyas columnas agrupan los vectores generados:
 
 Analicemos el factor de reducción del error $\rho = \frac{\sqrt{\kappa(A)} - 1}{\sqrt{\kappa(A)} + 1}$:
 
-- **Matriz Bien Condicionada ($\kappa(A) \approx 1$):**
-  - $\sqrt{\kappa(A)} \approx 1 \implies \rho \approx 0$.
-  - El error decae exponencialmente y la convergencia se logra en un puñado de iteraciones.
+- $\kappa(A) \approx 1$: $\sqrt{\kappa(A)} \approx 1 \implies \rho \approx 0$.
+- El error decae exponencialmente y convergemos en pocas iteraciones.
 
-- **Matriz Mal Condicionada ($\kappa(A) \gg 1$):**
-  - $\sqrt{\kappa(A)}$ es grande $\implies \rho \approx 1 - \frac{2}{\sqrt{\kappa(A)}} \approx 1$.
-  - La reducción de error por iteración es muy lenta.
+- $\kappa(A) \gg 1$: $\sqrt{\kappa(A)}$ es grande $\implies \rho \approx 1 - \frac{2}{\sqrt{\kappa(A)}} \approx 1$.
+- La reducción de error por iteración es muy lenta.
 
-> **Importante:** A diferencia de los métodos estacionarios (donde la tasa suele depender de $1 - O(1/\kappa)$), CG depende de $\sqrt{\kappa(A)}$. ¡La raíz cuadrada representa una aceleración monumental cuando $\kappa(A)$ es grande!
+> A diferencia de los métodos anteriores, CG depende de $\sqrt{\kappa(A)}$. La raíz cuadrada representa una buena aceleración cuando $\kappa(A)$ es grande.
 
 ---
 
@@ -390,15 +380,14 @@ La cota con $\kappa(A)$ es un escenario pesimista de peor caso. La tasa real dep
 
 # El Fenómeno de Convergencia Superlineal
 
-En aplicaciones prácticas, suele observarse que **la convergencia de CG se acelera a medida que avanzan las iteraciones**:
+En la práctica la convergencia de CG se acelera a medida que itera:
 
 - **Mecanismo Espectral:**
-  - La iteración de Lanczos (y por ende CG) captura primero los autovalores y direcciones extremas del espectro (aproximaciones de Ritz).
-  - A medida que se neutralizan estas componentes en el error, el algoritmo opera eficazmente sobre un subespacio complementario con un **número de condición efectivo menor**:
-    $$\kappa_{\text{eff}} < \kappa(A)$$
+  - La iteración de CG captura primero los autovalores y direcciones extremas del espectro (aproximaciones de Ritz).
+  - A medida que se neutralizan estas componentes, el algoritmo opera sobre un subespacio con un **número de condición menor**
 
 - **Efecto de Bola de Nieve:**
-  - Al reducirse el $\kappa_{\text{eff}}$, la tasa de convergencia local mejora progresivamente en lugar de mantenerse constante.
+  - Al reducirse el $\kappa$, la tasa de convergencia local mejora progresivamente en lugar de mantenerse constante.
   - Esto explica por qué el error desciende muchas veces con una curva cóncava pronunciada hacia abajo (convergencia superlineal).
 
 ---
