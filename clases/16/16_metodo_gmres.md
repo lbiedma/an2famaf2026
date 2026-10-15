@@ -95,28 +95,6 @@ $$A Q_k = Q_{k+1} \tilde{H}_k$$
 
 ---
 
-## Fenómeno de Ruptura (Breakdown)
-
-Si en el paso $k$ el coeficiente subdiagonal se anula ($h_{k+1,k} = 0$):
-
-$$A Q_k = Q_k H_k$$
-
-### Implicaciones teóricas y prácticas:
-* El subespacio $\mathcal{K}_k(A, b)$ es **estrictamente invariante** bajo $A$.
-* Los $k$ autovalores de $H_k$ coinciden **exactamente** con un subconjunto de autovalores de $A$.
-* En algoritmos como GMRES, esto representa la convergencia exacta de la solución.
-
----
-
-## Valores de Ritz y Convergencia Espectral
-
-Los autovalores $\theta_j$ de la matriz reducida $H_k \in \mathbb{R}^{k \times k}$ se denominan **valores de Ritz**.
-
-* A medida que $k$ aumenta, los valores de Ritz convergen rápidamente hacia los autovalores extremales (de mayor módulo o en los bordes del espectro) de $A$.
-* Si $H_k y^j = \theta_j y^j$, entonces $x^j = Q_k y^j$ es el **vector de Ritz** que aproxima al autovector correspondiente de $A$.
-
----
-
 ## Casos Particulares y Extensiones
 
 1. **Matriz Simétrica / Hermitiana ($A = A^*$):**
@@ -128,85 +106,6 @@ Los autovalores $\theta_j$ de la matriz reducida $H_k \in \mathbb{R}^{k \times k
 
 3. **Reinicio Implicito:**
    * En problemas muy grandes, $k$ no puede crecer indefinidamente por restricciones de memoria; se aplican técnicas de reinicio (ej. IRAM / ARPACK).
-
----
-
-# Convergencia del Proceso de Arnoldi
-## Análisis Polinomial y Comportamiento Espectral
-
-* **Objetivo:** Comprender la rapidez y el modo en que los valores de Ritz aproximan a los autovalores de la matriz $A$.
-* **Marco Teórico:** La convergencia se analiza mediante la teoría de **aproximación polinomial** sobre el espectro $\Lambda(A)$.
-* **Idea Clave:** La iteración de Arnoldi resuelve implícitamente un problema de minimización de norma sobre polinomios mónicos.
-
----
-
-## El Residuo de un Par de Ritz
-
-Sea $(y_k, \theta_k)$ un par propio de la matriz reducida $H_k \in \mathbb{R}^{k \times k}$, es decir, $H_k y_k = \theta_k y_k$ con $\|y_k\|_2 = 1$.
-
-* El **vector de Ritz** correspondiente en $\mathbb{R}^n$ es $u_k = Q_k y_k$ (con $\|u_k\|_2 = 1$).
-* Aplicando la relación fundamental $A Q_k = Q_k H_k + h_{k+1,k} q_{k+1} e_k^T$:
-
-$$A u_k - \theta_k u_k = A Q_k y_k - \theta_k Q_k y_k = h_{k+1,k} (e_k^T y_k) q_{k+1}$$
-
-* **Norma del Residuo:**
-  $$\|A u_k - \theta_k u_k\|_2 = h_{k+1,k} |e_k^T y_k|$$
-
-> **Conclusión:** El par de Ritz es una solución exacta si $h_{k+1,k} = 0$ (ruptura) o si la última componente del autovector $y_k$ es prácticamente nula.
-
----
-
-## Propiedad de Minimización Polinomial
-
-Sea $\mathcal{P}_k^1$ el conjunto de todos los **polinomios mónicos** de grado $k$ (de la forma $p(z) = z^k + c_{k-1} z^{k-1} + \dots + c_0$).
-
-Si definimos $p_k(z) = \det(z I_k - H_k)$ como el polinomio característico de $H_k$:
-
-1. $p_k$ es un polinomio mónico de grado $k$.
-2. Se cumple la propiedad de optimalidad:
-   $$\|p_k(A) q_1\|_2 = \min_{p \in \mathcal{P}_k^1} \|p(A) q_1\|_2$$
-
-* La iteración de Arnoldi encuentra el polinomio mónico que **minimiza la norma del vector residual** $p(A) q_1$ en el subespacio de Krylov.
-
----
-
-## Cota de Error mediante Diagonalización
-
-Si la matriz $A \in \mathbb{R}^{n \times n}$ es diagonalizable ($A = X \Lambda X^{-1}$ con $\Lambda = \operatorname{diag}(\lambda_1, \dots, \lambda_n)$):
-
-* Para cualquier polinomio $p(z)$:
-  $$p(A) = X p(\Lambda) X^{-1} = X \operatorname{diag}(p(\lambda_1), \dots, p(\lambda_n)) X^{-1}$$
-
-* Aplicando normas matriciales subordenadas:
-  $$\|p_k(A) q_1\|_2 \le \kappa_2(X) \min_{p \in \mathcal{P}_k^1} \max_{\lambda \in \Lambda(A)} |p(\lambda)|$$
-
-donde $\kappa_2(X) = \|X\|_2 \|X^{-1}\|_2$ es el número de condición de la matriz de autovectores.
-
----
-
-## Convergencia de Autovalores Aislados (Outliers)
-
-El comportamiento de $\min_{p \in \mathcal{P}_k^1} \max_{\lambda \in \Lambda(A)} |p(\lambda)|$ explica qué autovalores se capturan primero:
-
-1. **Autovalores periféricos o aislados:**
-   * Si un autovalor $\lambda_1$ está alejado del resto del espectro, un polinomio $p_k$ de grado modesto puede colocar una raíz en $\lambda_1$ haciendo $p_k(\lambda_1) \approx 0$.
-   * Esto cancela la componente asociada a $\lambda_1$ rápidamente.
-
-2. **Efecto de "Deflación Implícita":**
-   * Una vez que un valor de Ritz converge a $\lambda_1$, los pasos posteriores de Arnoldi se enfocan en los autovalores restantes, convergiendo en orden desde el exterior hacia el interior del espectro.
-
----
-
-## El Papel de los Polinomios de Chebyshev
-
-Cuando los autovalores no aislados de $A$ están contenidos en una región convexa (como una elipse o un intervalo en $\mathbb{R}$):
-
-* La minimización de $|p(\lambda)|$ se resuelve utilizando **Polinomios de Chebyshev** desplazados y escalados.
-* La tasa de convergencia depende de la razón del eje mayor al eje menor de la región espectral.
-
-### Resumen del Comportamiento de Arnoldi
-* **Matrices Normales ($\kappa_2(X) = 1$):** La convergencia está completamente determinada por la distribución geométrica de los autovalores en el plano complejo.
-* **Matrices No Normales ($\kappa_2(X) \gg 1$):** El término $\kappa_2(X)$ puede retrasar la convergencia inicial (pseudoespectro), aunque el carácter de minimización polinomial se mantiene.
 
 ---
 
@@ -270,18 +169,3 @@ Para resolver $\min_{y} \|\beta e_1 - \tilde{H}_k y\|_2$ de manera incremental e
 3. **Cálculo directo del residuo:**
    $$\|b - A x_k\|_2 = |\gamma_{k+1}|$$
    * Permite monitorear la convergencia **sin calcular explícitamente $x_k$ ni resolver el sistema $R_k y_k = g_k$** hasta alcanzar la tolerancia deseada.
-
----
-
-## GMRES Reiniciado: $GMRES(m)$
-
-### Limitación computacional
-A medida que $k$ crece:
-* El almacenamiento de las columnas de $Q_k$ requiere $O(k n)$ de memoria.
-* El costo de ortogonalización escala como $O(k^2 n)$.
-
-### Algoritmo $GMRES(m)$
-* Se fija un número máximo de pasos $m$ (ej. $m = 30$ o $m = 50$).
-* Al alcanzar $m$ iteraciones, se calcula $x_m$, se reevalúa el residuo $r_m = b - A x_m$, y se reinicia el proceso tomando $x_0 \leftarrow x_m$.
-
-> **Efecto de estancamiento:** El reinicio pierde la propiedad de optimalidad global sobre el subespacio de Krylov expandido, lo que puede frenar la convergencia si $m$ es demasiado pequeño.
