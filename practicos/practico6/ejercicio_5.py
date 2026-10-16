@@ -29,7 +29,7 @@ q_0 = np.random.random(3)
 
 q_inf, rho_inf = autpotencias_inf(A_0, q_0)
 
-print(f"||A@q_inf - rho_inf*q_inf||_inf = {np.linalg.norm(A_0@q_inf - rho_inf*q_inf, np.inf)}")
+#print(f"||A@q_inf - rho_inf*q_inf||_inf = {np.linalg.norm(A_0@q_inf - rho_inf*q_inf, np.inf)}")
 
 
 # Version norma 2
@@ -49,11 +49,12 @@ def autpotencias_2 (A, q_0, err=1e-10, M=500):
 
 #TEST
 A_0 = np.random.random((3,3))
+A_0 = A_0.T@A_0
 q_0 = np.random.random(3)
 
 q_2, rho_2 = autpotencias_2(A_0, q_0)
 
-print(f"||A@q_2 - rho_2*q_2||_2 = {np.linalg.norm(A_0@q_2 - rho_2*q_2, 2)}")
+#print(f"||A@q_2 - rho_2*q_2||_2 = {np.linalg.norm(A_0@q_2 - rho_2*q_2, 2)}")
 
 # Version cociente de Rayleigh
 
@@ -82,5 +83,11 @@ A_0 = np.random.random((3,3))
 q_0 = np.random.random(3)
 
 q_r, rho_r = autrayleigh(A_0, q_0)
+print('----------------------------------------')
+print(rho_r)
 
-print(f"||A@q_r - rho_r*q_r||_2 = {np.linalg.norm(A_0@q_r - rho_r*q_r, 2)}")
+aut_vals = np.linalg.eigvals(A_0)
+print(q_r.T@q_r)
+print(aut_vals)
+
+#print(f"||A@q_r - rho_r*q_r||_2 = {np.linalg.norm(A_0@q_r - rho_r*q_r, 2)}")
