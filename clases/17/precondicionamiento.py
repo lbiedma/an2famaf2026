@@ -5,7 +5,7 @@ import scipy.sparse.linalg as spla
 import matplotlib.pyplot as plt
 
 # 1. Construir un problema SDP mal condicionado (laplaciano anisótropo 2D)
-N = 200                # Grilla 200x200 => n = 40.000 incógnitas en el interior
+N = 300                # Grilla 300x300 => n = 90.000 incógnitas en el interior
 eps = 1e-4             # Fuerte anisotropía
 h = 1.0 / (N + 1)
 

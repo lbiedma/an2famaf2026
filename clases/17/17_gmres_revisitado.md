@@ -57,7 +57,7 @@ Sea $\bar{x} \in z + \mathcal{K}$ tal que $\nabla f(\bar{x})^T v = 0$ $\forall v
 
 - Para cualquier $x \in z + \mathcal{K}$ arbitrario, existe $v \in \mathcal{K}$ tal que $x = z + v$.
 - Como $v - \bar{v} \in \mathcal{K}$, se cumple que $\nabla f(\bar{x})^T (v - \bar{v}) = 0$.
-- Notando que $x - \bar{x} = v - \bar{v}$, $\nabla^2 f(x) = Q$ es semidefinida positiva y las derivadas de orden superior son nulas, realizamos la expansión exacta de Taylor:
+- Notando que $x - \bar{x} = v - \bar{v}$, $\nabla^2 f(x) = Q$ es semidefinida positiva y las derivadas de orden superior son nulas, realizamos la expansión de Taylor:
    $$f(x) = f(\bar{x}) + \nabla f(\bar{x})^T (x - \bar{x}) + \frac{1}{2} (x - \bar{x})^T \nabla^2 f(\bar{x}) (x - \bar{x}) \quad$$
    $$f(x) = f(\bar{x}) + \underbrace{\nabla f(\bar{x})^T (v - \bar{v})}_{= 0} + \frac{1}{2} \underbrace{(v - \bar{v})^T Q (v - \bar{v})}_{\ge 0} \ge f(\bar{x}) \quad$$
 - Por lo tanto, $f(x) \ge f(\bar{x}) \forall x \in z + \mathcal{K}$, y $\bar{x}$ es minimizador global sobre $z + \mathcal{K}$. $\blacksquare$
@@ -104,7 +104,7 @@ Para evitar problemas numéricos, el método de Arnoldi construye iterativamente
 
 # Propiedades Matriciales y la Relación de Arnoldi
 
-Al agrupar los $m$ pasos del algoritmo se deduce la identidad del subespacio de Krylov:
+Al agrupar $m$ pasos del algoritmo se deduce la identidad del subesp. de Krylov:
 
 **Proposición** Sea $A \in \mathbb{R}^{n \times n}$ y suponga que Arnoldi realiza $m$ pasos ($m \le n$). Sea $\bar{H}_m \in \mathbb{R}^{(m+1) \times m}$ la matriz generada, y $H_m \in \mathbb{R}^{m \times m}$ $\bar{H}_m$ sin la última fila.
 - **Demostración:** se genera la *Identidad de Arnoldi*:
@@ -168,7 +168,7 @@ Podemos reemplazar el sistema original $Ax = b$ por un sistema equivalente que p
 
 # Formulación Matemática
 
-Buscamos una matriz no singular $M \in \mathbb{R}^{n \times n}$ (el **precondicionador**) que aproxime a $A$:
+Buscamos una matriz invertible $M \in \mathbb{R}^{n \times n}$ (**precondicionador**) que aproxime a $A$
 
 - **Precondicionamiento por la Izquierda:**
   $$M^{-1} A x = M^{-1} b \quad$$
