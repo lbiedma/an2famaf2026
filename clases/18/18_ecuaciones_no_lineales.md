@@ -11,7 +11,7 @@ style: |
 ---
 
 # Análisis Numérico II / Álgebra Lineal Numérica
-## Clase 18: Ecuaciones No Lineales y Minimización
+## Clase 18: Ecuaciones No Lineales
 ![height:50%](https://www.famaf.unc.edu.ar/documents/3264/Logo_FAMAF_UNC_color.png)
 
 ---
@@ -144,10 +144,10 @@ Si además $\|F'(\tilde{x}) - F'(x)\| \le \ell \|\tilde{x} - x\|$ para todo $\ti
 
 En problemas de gran dimensión, resolver el sistema lineal de Newton de forma exacta resulta numéricamente costoso.
 
-- Se acepta un paso $d_k$ que satisface $\|F(x_k) + F'(x_k) d_k\| \le \eta_k \|F(x_k)\|$, donde $\{\eta_k\}$ es la "sucesión forzante".
-- Se define $\eta_k = \min\{\gamma, \|F(x_k)\|^\delta\}$ con $\gamma, \delta \in (0, 1)$.
-- El sistema lineal $F'(x_k) d = -F(x_k)$ se resuelve inexactamente utilizando GMRES, deteniendo la iteración cuando el residuo alcance la tolerancia $\eta_k \|F(x_k)\|$.
-- Si $\eta_0 \le \delta$ y $x_0$ está suficientemente cerca de $x^*$, $\{x_k\}$ converge linealmente; si además $\eta_k \to 0^+$, la convergencia es superlineal.
+- Se acepta un paso $d_k$ que satisface $\|F(x^k) + F'(x^k) d^k\| \le \eta_k \|F(x^k)\|$, donde $\{\eta_k\}$ es la "sucesión forzante".
+- Se define $\eta_k = \min\{\gamma, \|F(x^k)\|^\delta\}$ con $\gamma, \delta \in (0, 1)$.
+- El sistema lineal $F'(x^k) d = -F(x^k)$ se resuelve inexactamente utilizando GMRES, deteniendo la iteración cuando el residuo alcance la tolerancia $\eta_k \|F(x^k)\|$.
+- Si $\eta_0 \le \delta$ y $x^0$ está suficientemente cerca de $x^*$, $\{x^k\}$ converge linealmente; si además $\eta_k \to 0^+$, la convergencia es superlineal.
 
 ---
 
@@ -181,7 +181,7 @@ En problemas de gran dimensión, resolver el sistema lineal de Newton de forma e
 ---
 
 # Métodos Cuasi-Newton: Ejemplos
-- **Diferencias Finitas:** Aproxima cada columna de $M_k$ mediante $M_{*,j} = \frac{1}{h}[F(x + h e_j) - F(x)]$ tomando $h = \sqrt{\epsilon_{\text{máq}}} \|x\|$.
+- **Diferencias Finitas:** Aproxima cada columna de $M_k$ mediante $M_{*,j} = \frac{1}{h}[F(x + h e^j) - F(x)]$ tomando $h = \sqrt{\epsilon_{\text{máq}}} \|x\|$.
 - **Ecuación Secante:** Exige que la actualización $M_{k+1}$ satisfaga $M_{k+1} d^k = y^k$, donde $y^k = F(x^{k+1}) - F(x^k)$ y $d^k = x^{k+1} - x^k$.
 - **Actualización de Broyden:** Actualización de rango 1 sobre matriz inversa $W_k = M_k^{-1}$, permitiendo calcular $d^k = -W_k F(x^k)$ con producto matriz-vector:
 $$W_{k+1} = W_k + \frac{(d^k - W_k y^k) (y^k)^T}{(y^k)^T y^k}$$
@@ -285,118 +285,3 @@ Un punto $x^* \in \mathbb{R}^n$ es un punto estacionario si satisface $\nabla f(
 ### Teorema (Condición Suficiente de Optimalidad)
 Si $f$ es dos veces diferenciable en $x^*$, $\nabla f(x^*) = 0$ y $\nabla^2 f(x^*)$ es **definida positiva**, entonces $x^*$ es un minimizador local de $f$. Existen $\epsilon > 0$ y $\gamma > 0$ tales que:
 $$f(x) \ge f(x^*) + \frac{\gamma}{2} \|x - x^*\|^2, \quad \forall x \in \mathcal{B}(x^*, \epsilon) \quad$$
-
----
-
-# Esquema General de Búsqueda Lineal
-
-Los algoritmos de **búsqueda lineal** generan una sucesión $x_{k+1} = x_k + \alpha_k d_k$:
-
-1. Dar $x_0 \in \mathbb{R}^n$ y $k = 0$.
-2. Si $\|\nabla f(x_k)\| = 0$, detener el proceso (punto estacionario alcanzado).
-3. Obtener una **dirección de descenso** $d_k \in \mathbb{R}^n$ tal que $\nabla f(x_k)^T d_k < 0$.
-4. Obtener un **tamaño de paso** $\alpha_k > 0$ tal que $f(x_k + \alpha_k d_k) < f(x_k)$.
-5. Definir $x_{k+1} = x_k + \alpha_k d_k$, hacer $k \leftarrow k + 1$ y regresar al Paso 1.
-
-*Al finalizar el proceso, debe verificarse si la Hessiana $\nabla^2 f(x_{k+1})$ es definida positiva.*
-
----
-
-# Algoritmo: Regla de Armijo (Selección del Paso)
-
-Garantiza un **descenso suficiente** reduciendo el paso inicial $\alpha = 1$ mediante un factor $\beta \in (0, 1)$ hasta satisfacer $\phi(\alpha) \le \phi_0 + \tau \alpha \phi'_0$, con $\tau \in (0, 1)$.
-
-**Entradas:** $f: \mathbb{R}^n \to \mathbb{R}$, $x, d \in \mathbb{R}^n$, $\phi_0 = f(x)$, $\phi'_0 = \nabla f(x)^T d$, $m \in \mathbb{N}$, $\tau, \beta \in (0, 1)$.
-**Salida:** $x^+ = x + \alpha d$.
-1. Definir $\alpha = 1$.
-2. Para $k = 1, \dots, m$, definir $x^+ = x + \alpha d$, $\phi = f(x^+)$.
-   Si $\phi \le \phi_0 + \tau \alpha \phi'_0$, ir al paso 3. Sino, hacer $\alpha \leftarrow \beta \alpha$.
-3. Retornar $x^+$.
-
-*En la práctica se utilizan típicamente $\beta = 0.5$ y $\tau = 10^{-4}$.*
-
----
-
-# Algoritmo: Regla de Goldstein (Selección del Paso)
-
-Evita que el paso $\alpha$ sea demasiado pequeño imponiendo una **cota inferior y superior** sobre el incremento funcional mediante el parámetro $\tau \in (0, 1/2)$.
-
-**Entradas:** $f: \mathbb{R}^n \to \mathbb{R}$, $x, d \in \mathbb{R}^n$, $\phi_0, \phi'_0 \in \mathbb{R}$, $m \in \mathbb{N}$, $\tau \in (0, 1/2)$, $\beta \in (0, 1)$, $\rho > 1$.
-**Salida:** $x^+ = x + \alpha d$.
-1. Definir $\alpha = 1$, $\alpha_l = 0$ y $\alpha_u = +\infty$.
-2. Para $k = 1, \dots, m$, definir $x^+ = x + \alpha d$, $\phi = f(x^+)$.
-   - Si $\phi \le \phi_0 + \alpha \tau \phi'_0$, ir al paso 2 si $\phi \ge \phi_0 + \alpha (1 - \tau) \phi'_0$ o hacer $\alpha_l = \alpha$ caso contrario. Sino, hacer $\alpha_u = \alpha$.
-   - Definir $\alpha = (1 - \beta)\alpha_l + \beta \alpha_u$ si $\alpha_u < +\infty$, o $\rho \alpha_l$ si $\alpha_u = +\infty$.
-3. Retornar $x^+.$
-
----
-
-# Estrategias Alternativas para la Selección del Paso
-
-Además de las reglas de Armijo y Goldstein, existen otras maneras de determinar $\alpha_k$:
-
-- **Paso Exacto:** Se toma $\alpha_k = \arg\min_{\alpha \ge 0} f(x_k + \alpha d_k)$. Se utiliza cuando la minimización unidimensional se deduce analíticamente mediante una fórmula cerrada (ej. métodos de proyección).
-- **Paso Menguante:** Se predefine una sucesión $\{\alpha_k\}$ que satisface $\alpha_k \to 0^+$ y $\sum_{k=0}^\infty \alpha_k = +\infty$. Se aplica si la evaluación funcional de $f(x)$ es muy costosa.
-- **Paso Constante:** Se fija $\alpha_k = \alpha > 0$ siempre. Sólo se aconseja en problemas con estructura particular y cotas espectrales conocidas.
-
----
-
-# Algoritmo: Método de Cauchy para Minimización
-
-Utiliza la dirección de **máximo descenso** $d_k = -\nabla f(x_k)$, que resulta de minimizar $\nabla f(x_k)^T d$ sobre la bola $\|\cdot\|_2 \le 1$.
-
-**Entradas:** $f: \mathbb{R}^n \to \mathbb{R}$, $x \in \mathbb{R}^n$, $\epsilon > 0$ y $m \in \mathbb{N}$.
-**Salida:** $x^+$ aproximación de $x^*$.
-1. Obtener $\phi = f(x)$, $r = \nabla f(x)$ y definir $\sigma = \|r\|_2$.
-2. Para $k = 1, \dots, m$, si $\sigma \le \epsilon$, ir al paso 3. Sino, definir:
-   - $x$ aplicando el **Algoritmo (Armijo)** con $\phi_0 = \phi$ y $\phi'_0 = -\sigma^2$.
-   - $\phi = f(x)$, $r = \nabla f(x)$, $\sigma = \|r\|_2$.
-3. Retornar $x^+ = x$.
-
----
-
-# Algoritmo: Método de Newton para Minimización
-
-Resuelve el sistema de segundo orden $\nabla^2 f(x_k) d_k = -\nabla f(x_k)$ derivado de la condición de estacionariedad $\nabla f(x) = 0$.
-
-**Entradas:** $f: \mathbb{R}^n \to \mathbb{R}$, $x \in \mathbb{R}^n$, $\epsilon > 0$ y $m \in \mathbb{N}$. **Salida:** $x^+$ aproximación de $x^*$.
-1. Obtener $\phi = f(x)$, $r = \nabla f(x)$ y $H = \nabla^2 f(x)$.
-2. Para $k = 1, \dots, m$, si $\|r\|_2 \le \epsilon$, ir al paso 3. Sino, definir:
-   - $d$ tal que $r + H d = 0$ resolviendo el sistema SDP mediante Cholesky.
-   - $x$ aplicando Armijo con $\phi_0 = \phi$ y $\phi'_0 = r^T d$.
-   - $\phi = f(x)$, $r = \nabla f(x)$, $H = \nabla^2 f(x)$.
-3. Retornar $x^+ = x$.
-
----
-
-# Modificaciones del Método de Newton
-
-Cuando $f$ no es estrictamente convexa, la Hessiana $\nabla^2 f(x_k)$ puede ser indefinida o singular. Se aplican modificaciones para garantizar la definición positiva:
-
-- **Cholesky Modificado:** Reemplaza los pivotes $G_{ii} \le \epsilon_0$ por $\epsilon_1 > \epsilon_0 \ge 0$ antes de calcular la raíz cuadrada, asegurando $G^T G = \nabla^2 f(x_k) + E_k > 0$.
-- **Dirección de Gauss-Newton:** Para problemas de cuadrados mínimos no lineales $f(x) = \frac{1}{2}\|F(x)\|_2^2$, se aproxima la Hessiana omitiendo las derivadas de segundo orden: $H_k = F'(x_k)^T F'(x_k) \ge 0$.
-- **Método de Levenberg-Marquardt:** Regulariza la matriz de Gauss-Newton sumando un término diagonal $\gamma_k I$ con $\gamma_k > 0$: $H_k = F'(x_k)^T F'(x_k) + \gamma_k I > 0$.
-
----
-
-# Algoritmo: Método BFGS para Minimización
-
-Implementa la actualización secante de rango 2 para la inversa de la Hessiana $W_k \approx (\nabla^2 f(x_k))^{-1}$, permitiendo calcular $d = -W r$ con un producto matriz-vector.
-
-**Entradas:** $f: \mathbb{R}^n \to \mathbb{R}$, $x \in \mathbb{R}^n$, $\epsilon > 0$ y $m \in \mathbb{N}$.
-
-1. Obtener $\phi = f(x)$, $r = \nabla f(x)$, definir $W = I$ y $x^+ = x$.
-2. Para $k = 1, \dots, m$, si $\|r\|_2 \le \epsilon$, ir al paso 2. Sino, definir:
-   - $d = -W r$, $x^+$ aplicando Armijo con $\phi_0 = f(x)$ y $\phi'_0 = r^T d$.
-   - $\phi = f(x^+)$, $r^+ = \nabla f(x^+)$, $y = r^+ - r$, $v = x^+ - x$, $w = W y$.
-   - $\gamma = y^T v$, $\tau = y^T w$, $p = v/\gamma - w/\tau$.
-   - $W = W + \frac{v v^T}{\gamma} - \frac{w w^T}{\tau} + \tau p p^T$, $x = x^+$, $r = r^+$.
-3. Retornar $x^+$.
-
----
-
-# Convergencia del Método de Búsqueda Lineal
-
-- **Peligro de las Búsquedas Unidimensionales:**
-  Dada $f(x_1, x_2) = (x_2 - p x_1^2)(x_2 - q x_1^2)$ con $0 < p < q$, el origen $(0,0)$ es un minimizador local a lo largo de **toda recta** que pasa por él, pero **no es un minimizador local en $\mathbb{R}^2$**.
-- **Teorema:** Sea $f$ continuamente diferenciable y $\{x_k\}$ generada por un método de búsqueda lineal con paso de Armijo y dirección que satisface $\nabla f(x_k)^T d_k \le -\gamma \|\nabla f(x_k)\|^q$ con $\gamma, q > 0$. Entonces todo punto límite $x^*$ de la sucesión $\{x_k\}$ es un **punto estacionario** ($\nabla f(x^*) = 0$).
